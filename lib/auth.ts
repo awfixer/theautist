@@ -6,8 +6,8 @@ import { cache } from "react"
  * This function is cached for the duration of the request
  */
 export const getSession = cache(async () => {
-  const session = await auth()
-  return session
+  return await auth();
+
 })
 
 /**
