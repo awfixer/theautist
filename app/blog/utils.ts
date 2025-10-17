@@ -8,6 +8,7 @@ type Metadata = {
   image?: string
   draft?: boolean
   paid?: boolean
+  tier?: string // Patreon tier required for access (basic, premium, ultimate)
 }
 
 function parseFrontmatter(fileContent: string) {
