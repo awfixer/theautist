@@ -9,8 +9,8 @@ dependencies:
     specifier: 4.0.0-alpha.13
     version: 4.0.0-alpha.13(postcss@8.4.35)
   '@types/node':
-    specifier: 20.11.17
-    version: 20.11.17
+    specifier: 20.19.22
+    version: 20.19.22
   '@types/react':
     specifier: 18.2.55
     version: 18.2.55
@@ -346,10 +346,10 @@ packages:
     resolution: {integrity: sha512-nG96G3Wp6acyAgJqGasjODb+acrI7KltPiRxzHPXnP3NgI28bpQDRv53olbqGXbfcgF5aiiHmO3xpwEpS5Ld9g==}
     dev: false
 
-  /@types/node@20.11.17:
-    resolution: {integrity: sha512-QmgQZGWu1Yw9TDyAP9ZzpFJKynYNeOvwMJmaxABfieQoVoiVOS6MN1WSpqpRcbeA5+RW82kraAVxCCJg+780Qw==}
+  /@types/node@20.19.22:
+    resolution: {integrity: sha512-hRnu+5qggKDSyWHlnmThnUqg62l29Aj/6vcYgUaSFL9oc7DVjeWEQN3PRgdSc6F8d9QRMWkf36CLMch1Do/+RQ==}
     dependencies:
-      undici-types: 5.26.5
+      undici-types: 6.21.0
     dev: false
 
   /@types/prop-types@15.7.11:
@@ -1469,8 +1469,8 @@ packages:
     hasBin: true
     dev: false
 
-  /undici-types@5.26.5:
-    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
+  /undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
     dev: false
 
   /unified@10.1.2:
