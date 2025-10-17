@@ -67,7 +67,7 @@ export function BlogSearch({ posts }: { posts: BlogPost[] }) {
       ) : (
         <div className="space-y-4">
           {sortedPosts.map((post) => (
-            <Link key={post.slug} href={`/blog/${post.slug}`}>
+            <Link key={post.slug} href={`/blog/${encodeURIComponent(post.slug)}`}>
               <Card className="transition-all hover:shadow-md">
                 <CardHeader>
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
