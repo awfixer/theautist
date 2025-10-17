@@ -6,6 +6,8 @@
     "start": "next start"
   },
   "dependencies": {
+    "@flags-sdk/growthbook": "^0.1.0",
+    "@growthbook/growthbook-react": "^1.6.1",
     "@radix-ui/react-slot": "^1.2.3",
     "@types/node": "^22.10.2",
     "@types/react": "^18.3.18",

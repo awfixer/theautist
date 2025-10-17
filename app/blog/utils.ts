@@ -6,6 +6,8 @@ type Metadata = {
   publishedAt: string
   summary: string
   image?: string
+  draft?: boolean
+  paid?: boolean
 }
 
 function parseFrontmatter(fileContent: string) {
@@ -20,7 +22,16 @@ function parseFrontmatter(fileContent: string) {
     let [key, ...valueArr] = line.split(': ')
     let value = valueArr.join(': ').trim()
     value = value.replace(/^['"](.*)['"]$/, '$1') // Remove quotes
-    metadata[key.trim() as keyof Metadata] = value
+    let trimmedKey = key.trim() as keyof Metadata
+
+    // Handle boolean values
+    if (value === 'true') {
+      (metadata as any)[trimmedKey] = true
+    } else if (value === 'false') {
+      (metadata as any)[trimmedKey] = false
+    } else {
+      (metadata as any)[trimmedKey] = value
+    }
   })
 
   return { metadata: metadata as Metadata, content }
@@ -50,7 +61,14 @@ function getMDXData(dir: string) {
 }
 
 export function getBlogPosts() {
-  return getMDXData(path.join(process.cwd(), 'app', 'blog', 'posts'))
+  const allPosts = getMDXData(path.join(process.cwd(), 'app', 'blog', 'posts'))
+
+  // Filter out drafts in production
+  if (process.env.NODE_ENV === 'production') {
+    return allPosts.filter((post) => !post.metadata.draft)
+  }
+
+  return allPosts
 }
 
 export function formatDate(date: string, includeRelative = false) {
