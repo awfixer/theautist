@@ -4,7 +4,12 @@ import { MDXRemote } from 'next-mdx-remote/rsc'
 import { highlight } from 'sugar-high'
 import React from 'react'
 
-function Table({ data }) {
+interface TableData {
+  headers: string[]
+  rows: string[][]
+}
+
+function Table({ data }: { data: TableData }) {
   let headers = data.headers.map((header, index) => (
     <th key={index}>{header}</th>
   ))
@@ -26,10 +31,10 @@ function Table({ data }) {
   )
 }
 
-function CustomLink(props) {
+function CustomLink(props: React.ComponentPropsWithoutRef<'a'>) {
   let href = props.href
 
-  if (href.startsWith('/')) {
+  if (href && href.startsWith('/')) {
     return (
       <Link href={href} {...props}>
         {props.children}
@@ -37,23 +42,24 @@ function CustomLink(props) {
     )
   }
 
-  if (href.startsWith('#')) {
+  if (href && href.startsWith('#')) {
     return <a {...props} />
   }
 
   return <a target="_blank" rel="noopener noreferrer" {...props} />
 }
 
-function RoundedImage(props) {
-  return <Image alt={props.alt} className="rounded-lg" {...props} />
+function RoundedImage(props: React.ComponentPropsWithoutRef<typeof Image>) {
+  return <Image {...props} alt={props.alt || ''} className="rounded-lg" />
 }
 
-function Code({ children, ...props }) {
-  let codeHTML = highlight(children)
+function Code({ children, ...props }: React.ComponentPropsWithoutRef<'code'>) {
+  const codeString = typeof children === 'string' ? children : String(children)
+  let codeHTML = highlight(codeString)
   return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />
 }
 
-function slugify(str) {
+function slugify(str: string): string {
   return str
     .toString()
     .toLowerCase()
@@ -64,9 +70,10 @@ function slugify(str) {
     .replace(/\-\-+/g, '-') // Replace multiple - with single -
 }
 
-function createHeading(level) {
-  const Heading = ({ children }) => {
-    let slug = slugify(children)
+function createHeading(level: number) {
+  const Heading = ({ children }: { children?: React.ReactNode }) => {
+    const text = typeof children === 'string' ? children : String(children || '')
+    let slug = slugify(text)
     return React.createElement(
       `h${level}`,
       { id: slug },
@@ -99,7 +106,7 @@ let components = {
   Table,
 }
 
-export function CustomMDX(props) {
+export function CustomMDX(props: React.ComponentPropsWithoutRef<typeof MDXRemote>) {
   return (
     <MDXRemote
       {...props}
