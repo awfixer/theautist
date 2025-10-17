@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getTierById, formatTierAmount } from '@/config/patreon-tiers'
+import { getTierById, formatTierAmount, hasAccess } from '@/config/patreon-tiers'
 
 interface PaidPostGateProps {
   children: React.ReactNode
@@ -12,7 +12,7 @@ export function PaidPostGate({ children, requiredTier, userTier }: PaidPostGateP
   const userTierInfo = userTier ? getTierById(userTier) : undefined
 
   // Determine if user has a tier but it's insufficient
-  const hasInsufficientTier = !!userTier && !!requiredTier && !tierInfo
+  const hasInsufficientTier = !!userTier && !!requiredTier && !!tierInfo && !hasAccess(userTier, requiredTier)
 
   return (
     <div className="relative">
