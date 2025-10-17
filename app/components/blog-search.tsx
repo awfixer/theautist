@@ -41,12 +41,15 @@ export function BlogSearch({ posts }: { posts: BlogPost[] }) {
   })
 
   const sortedPosts = filteredPosts.sort((a, b) => {
-    if (
-      new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)
-    ) {
+    const dateA = new Date(a.metadata.publishedAt)
+    const dateB = new Date(b.metadata.publishedAt)
+    if (dateA > dateB) {
       return -1
     }
-    return 1
+    if (dateA < dateB) {
+      return 1
+    }
+    return 0
   })
 
   return (
