@@ -1,7 +1,7 @@
 'use client'
 
 import { GrowthBook, GrowthBookProvider } from '@growthbook/growthbook-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { getUserTier } from '@/lib/tier-access'
 
@@ -26,13 +26,10 @@ export function GrowthBookProviderWrapper({
   children: React.ReactNode
 }): React.ReactElement {
   const { data: session, status } = useSession()
-  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     // Load features from GrowthBook API
-    growthbook.loadFeatures().then(() => {
-      setIsLoaded(true)
-    })
+    growthbook.loadFeatures()
   }, [])
 
   useEffect(() => {

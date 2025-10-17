@@ -27,11 +27,11 @@ function parseFrontmatter(fileContent: string) {
 
     // Handle boolean values
     if (value === 'true') {
-      (metadata as any)[trimmedKey] = true
+      metadata[trimmedKey] = true as never
     } else if (value === 'false') {
-      (metadata as any)[trimmedKey] = false
+      metadata[trimmedKey] = false as never
     } else {
-      (metadata as any)[trimmedKey] = value
+      metadata[trimmedKey] = value as never
     }
   })
 
