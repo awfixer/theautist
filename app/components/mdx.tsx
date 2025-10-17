@@ -10,10 +10,10 @@ interface TableData {
 }
 
 function Table({ data }: { data: TableData }) {
-  let headers = data.headers.map((header, index) => (
+  const headers = data.headers.map((header, index) => (
     <th key={index}>{header}</th>
   ))
-  let rows = data.rows.map((row, index) => (
+  const rows = data.rows.map((row, index) => (
     <tr key={index}>
       {row.map((cell, cellIndex) => (
         <td key={cellIndex}>{cell}</td>
@@ -32,7 +32,7 @@ function Table({ data }: { data: TableData }) {
 }
 
 function CustomLink(props: React.ComponentPropsWithoutRef<'a'>) {
-  let href = props.href
+  const href = props.href
 
   if (href && href.startsWith('/')) {
     return (
@@ -55,7 +55,7 @@ function RoundedImage(props: React.ComponentPropsWithoutRef<typeof Image>) {
 
 function Code({ children, ...props }: React.ComponentPropsWithoutRef<'code'>) {
   const codeString = typeof children === 'string' ? children : String(children)
-  let codeHTML = highlight(codeString)
+  const codeHTML = highlight(codeString)
   return <code dangerouslySetInnerHTML={{ __html: codeHTML }} {...props} />
 }
 
@@ -73,7 +73,7 @@ function slugify(str: string): string {
 function createHeading(level: number) {
   const Heading = ({ children }: { children?: React.ReactNode }) => {
     const text = typeof children === 'string' ? children : String(children || '')
-    let slug = slugify(text)
+    const slug = slugify(text)
     return React.createElement(
       `h${level}`,
       { id: slug },
@@ -93,7 +93,7 @@ function createHeading(level: number) {
   return Heading
 }
 
-let components = {
+const components = {
   h1: createHeading(1),
   h2: createHeading(2),
   h3: createHeading(3),

@@ -3,7 +3,7 @@ import { getBlogPosts } from 'app/blog/utils'
 
 export async function GET() {
   // getBlogPosts() automatically filters out drafts in production
-  let allBlogs = await getBlogPosts()
+  const allBlogs = await getBlogPosts()
 
   const itemsXml = allBlogs
     .sort((a, b) => {
