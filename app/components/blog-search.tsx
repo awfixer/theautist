@@ -71,7 +71,7 @@ export function BlogSearch({ posts }: { posts: BlogPost[] }) {
               <Card className="transition-all hover:shadow-md">
                 <CardHeader>
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-                    <CardTitle className="text-lg">{post.metadata.title}</CardTitle>
+                    <CardTitle className="text-lg text-white">{post.metadata.title}</CardTitle>
                     <p className="text-sm text-muted-foreground tabular-nums">
                       {formatDate(post.metadata.publishedAt)}
                     </p>

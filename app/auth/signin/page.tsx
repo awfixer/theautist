@@ -12,7 +12,7 @@ function SignInContent(): JSX.Element {
     <div className="flex min-h-screen items-center justify-center bg-black">
       <div className="w-full max-w-md space-y-8 rounded-lg border border-neutral-800 bg-neutral-900 p-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight">Sign in</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-white">Sign in</h1>
           <p className="mt-2 text-sm text-neutral-400">
             Sign in with your Patreon account to continue
           </p>

@@ -10,7 +10,10 @@ const navItems = {
     name: 'blog',
   },
   'https://inv.wtf/deadinside': {
-    name: 'discord (the basement)',
+    name: 'discord',
+  },
+  'https://patreon.com/awfixer': {
+    name: 'patreon',
   },
 }
 
