@@ -83,7 +83,7 @@ html {
 }
 
 .prose a {
-  @apply underline transition-all decoration-neutral-500 underline-offset-2 decoration-[0.1em];
+  @apply text-neutral-100 underline transition-all underline-offset-2 decoration-[0.1em];
 }
 
 .prose .anchor:after {
