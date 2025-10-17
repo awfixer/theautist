@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Personal portfolio and blog site for theautist.me built with Next.js 15, React 19, and TypeScript in strict mode. The site features MDX-based blog posts with syntax highlighting, automatic sitemap/RSS generation, and OpenGraph image generation.
+Personal portfolio and blog site for theautist.me built with Next.js 15, React 19, and TypeScript in strict mode. The site features MDX-based blog posts with syntax highlighting, automatic sitemap/RSS generation, OpenGraph image generation, and Patreon-based authentication via NextAuth.js.
 
 ## Development Commands
 
@@ -163,9 +163,79 @@ To add new MDX components:
 
 Example: Custom callout boxes, embedded videos, interactive elements
 
+### Authentication System (NextAuth.js)
+
+The site uses NextAuth.js 5.0 (Auth.js) with Patreon as the sole authentication provider.
+
+**Key Files:**
+- `auth.ts`: NextAuth configuration with Patreon provider
+- `middleware.ts`: Auth middleware for protecting routes
+- `lib/auth.ts`: Server-side auth utility functions
+- `types/next-auth.d.ts`: TypeScript type extensions for session/user data
+- `app/api/auth/[...nextauth]/route.ts`: NextAuth API route handler
+- `app/auth/signin/page.tsx`: Custom sign-in page with Patreon branding
+- `app/auth/error/page.tsx`: Authentication error page
+- `app/components/auth-button.tsx`: Client-side sign in/out button
+- `app/components/session-provider.tsx`: Session provider wrapper
+
+**Environment Variables Required:**
+- `AUTH_SECRET`: Generated via `npx auth secret`
+- `PATREON_CLIENT_ID`: From Patreon OAuth app
+- `PATREON_CLIENT_SECRET`: From Patreon OAuth app
+- `NEXTAUTH_URL`: Base URL for callbacks (e.g., `http://localhost:3000`)
+
+**Setup Guide:**
+See `AUTH_SETUP.md` for complete setup instructions including:
+- Creating a Patreon OAuth application
+- Configuring redirect URIs
+- Setting up environment variables
+- Testing authentication flow
+- Security best practices
+
+**Session Data Structure:**
+```typescript
+{
+  user: {
+    id: string              // NextAuth user ID
+    patreonId: string       // Patreon user ID
+    name: string | null     // User's name
+    email: string | null    // User's email
+    image: string | null    // User's avatar
+  }
+}
+```
+
+**Usage Patterns:**
+
+Server Components:
+```typescript
+import { getSession, getCurrentUser, isAuthenticated } from '@/lib/auth'
+
+const session = await getSession()
+const user = await getCurrentUser()
+const authed = await isAuthenticated()
+```
+
+Client Components:
+```typescript
+'use client'
+import { useSession, signIn, signOut } from 'next-auth/react'
+
+const { data: session, status } = useSession()
+```
+
+Protected Routes:
+- Add route patterns to `middleware.ts` for authentication checks
+- Default: `/protected/*` requires authentication
+- Unauthenticated users redirected to `/auth/signin`
+
 ## Deployment Notes
 
 - Site is designed for Vercel deployment (Analytics + Speed Insights integrated)
-- All routes are statically generated at build time (no SSR)
+- All routes are statically generated at build time (no SSR except auth)
 - Build must succeed without errors (`pnpm build`)
 - TypeScript strict mode errors will fail the build
+- **Auth Environment Variables**: Must be configured in deployment platform
+  - Use different `AUTH_SECRET` for production
+  - Update Patreon OAuth redirect URIs for production domain
+  - Set `NEXTAUTH_URL` to production URL
