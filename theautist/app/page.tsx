@@ -3,7 +3,7 @@ import { BlogPosts } from 'app/components/posts'
 export default function Page() {
   return (
     <section>
-      <h1 className="mb-8 text-2xl font-semibold tracking-tighter text-white">
+      <h1 className="mb-8 text-2xl font-semibold tracking-tighter">
         My Portfolio
       </h1>
       <p className="mb-4">
@@ -12,11 +12,8 @@ export default function Page() {
 	no newsletter or anything crazy. You can join the discord using
 	that button up there at the top`}
       </p>
-      <p className="mb-4">
-        {'this blog only gets new features when i have a chance. You will not often find new features added as I am usually working on other projects that require more of my time. Check out the source code via the link at the bottom if you would like to see how it is going over there.'}
-      </p>
       <div className="my-8">
-        <BlogPosts limit={3} />
+        <BlogPosts />
       </div>
     </section>
   )

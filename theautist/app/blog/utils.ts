@@ -39,7 +39,7 @@ function getMDXData(dir: string) {
   let mdxFiles = getMDXFiles(dir)
   return mdxFiles.map((file) => {
     let { metadata, content } = readMDXFile(path.join(dir, file))
-    let slug = path.basename(file, path.extname(file)).replace(/[^a-zA-Z0-9-_]/g, '').toLowerCase()
+    let slug = path.basename(file, path.extname(file))
 
     return {
       metadata,
