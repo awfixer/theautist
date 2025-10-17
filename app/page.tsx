@@ -13,7 +13,7 @@ export default function Page() {
 	that button up there at the top`}
       </p>
       <div className="my-8">
-        <BlogPosts />
+        <BlogPosts limit={3} />
       </div>
     </section>
   )
