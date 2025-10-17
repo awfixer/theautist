@@ -8,7 +8,7 @@ const navItems = {
     name: 'blog',
   },
   'https://inv.wtf/deadinside': {
-    name: 'deploy',
+    name: 'discord (the basement)',
   },
 }
 
