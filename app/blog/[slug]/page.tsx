@@ -28,9 +28,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     summary: description,
     image,
   } = post.metadata
-  const ogImage = image
-    ? image
-    : `${baseUrl}/og?title=${encodeURIComponent(title)}`
+  const ogImage = image || `${baseUrl}/og?title=${encodeURIComponent(title)}`
+
 
   return {
     title,
