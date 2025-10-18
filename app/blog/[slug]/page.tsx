@@ -151,13 +151,15 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
       </div>
       <article className="prose">
         {showFullContent ? (
+        {showFullContent ? (
           <CustomMDX source={post.content} />
         ) : (
           <PaidPostGate requiredTier={requiredTier} userTier={userTier}>
-            <CustomMDX source={post.content} />
+            <div className="prose">
+              <p>{post.metadata.summary}</p>
+            </div>
           </PaidPostGate>
         )}
-      </article>
     </section>
   )
 }
