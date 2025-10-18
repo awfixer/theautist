@@ -6,21 +6,36 @@ type Metadata = {
   publishedAt: string
   summary: string
   image?: string
+  draft?: boolean
+  paid?: boolean
+  tier?: string // Patreon tier required for access (basic, premium, ultimate)
 }
 
 function parseFrontmatter(fileContent: string) {
-  let frontmatterRegex = /---\s*([\s\S]*?)\s*---/
-  let match = frontmatterRegex.exec(fileContent)
-  let frontMatterBlock = match![1]
-  let content = fileContent.replace(frontmatterRegex, '').trim()
-  let frontMatterLines = frontMatterBlock.trim().split('\n')
-  let metadata: Partial<Metadata> = {}
+  const frontmatterRegex = /---\s*([\s\S]*?)\s*---/
+  const match = frontmatterRegex.exec(fileContent)
+  const frontMatterBlock = match![1]
+  const content = fileContent.replace(frontmatterRegex, '').trim()
+  const frontMatterLines = frontMatterBlock.trim().split('\n')
+  const metadata: Partial<Metadata> = {}
 
   frontMatterLines.forEach((line) => {
-    let [key, ...valueArr] = line.split(': ')
+    const [key, ...valueArr] = line.split(': ')
     let value = valueArr.join(': ').trim()
     value = value.replace(/^['"](.*)['"]$/, '$1') // Remove quotes
-    metadata[key.trim() as keyof Metadata] = value
+    const trimmedKey = key.trim() as keyof Metadata
+
+    // Normalize value for boolean checks
+    const normalizedValue = value.trim().toLowerCase();
+
+    // Handle boolean values
+    if (normalizedValue === 'true') {
+      metadata[trimmedKey] = true as never
+    } else if (normalizedValue === 'false') {
+      metadata[trimmedKey] = false as never
+    } else {
+      metadata[trimmedKey] = value as never
+    }
   })
 
   return { metadata: metadata as Metadata, content }
@@ -31,15 +46,15 @@ function getMDXFiles(dir: string): string[] {
 }
 
 function readMDXFile(filePath: string): { metadata: Metadata; content: string } {
-  let rawContent = fs.readFileSync(filePath, 'utf-8')
+  const rawContent = fs.readFileSync(filePath, 'utf-8')
   return parseFrontmatter(rawContent)
 }
 
 function getMDXData(dir: string) {
-  let mdxFiles = getMDXFiles(dir)
+  const mdxFiles = getMDXFiles(dir)
   return mdxFiles.map((file) => {
-    let { metadata, content } = readMDXFile(path.join(dir, file))
-    let slug = path.basename(file, path.extname(file)).replace(/[^a-zA-Z0-9-_]/g, '').toLowerCase()
+    const { metadata, content } = readMDXFile(path.join(dir, file))
+    const slug = path.basename(file, path.extname(file)).replace(/[^a-zA-Z0-9-_]/g, '').toLowerCase()
 
     return {
       metadata,
@@ -50,19 +65,26 @@ function getMDXData(dir: string) {
 }
 
 export function getBlogPosts() {
-  return getMDXData(path.join(process.cwd(), 'app', 'blog', 'posts'))
+  const allPosts = getMDXData(path.join(process.cwd(), 'app', 'blog', 'posts'))
+
+  // Filter out drafts in production
+  if (process.env.NODE_ENV === 'production') {
+    return allPosts.filter((post) => !post.metadata.draft)
+  }
+
+  return allPosts
 }
 
 export function formatDate(date: string, includeRelative = false) {
-  let currentDate = new Date()
+  const currentDate = new Date()
   if (!date.includes('T')) {
     date = `${date}T00:00:00`
   }
-  let targetDate = new Date(date)
+  const targetDate = new Date(date)
 
-  let yearsAgo = currentDate.getFullYear() - targetDate.getFullYear()
-  let monthsAgo = currentDate.getMonth() - targetDate.getMonth()
-  let daysAgo = currentDate.getDate() - targetDate.getDate()
+  const yearsAgo = currentDate.getFullYear() - targetDate.getFullYear()
+  const monthsAgo = currentDate.getMonth() - targetDate.getMonth()
+  const daysAgo = currentDate.getDate() - targetDate.getDate()
 
   let formattedDate = ''
 
@@ -76,7 +98,7 @@ export function formatDate(date: string, includeRelative = false) {
     formattedDate = 'Today'
   }
 
-  let fullDate = targetDate.toLocaleString('en-us', {
+  const fullDate = targetDate.toLocaleString('en-us', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',

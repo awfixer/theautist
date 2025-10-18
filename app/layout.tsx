@@ -8,6 +8,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next'
 import Footer from './components/footer'
 import { baseUrl } from './sitemap'
 import { SessionProvider } from './components/session-provider'
+import { GrowthBookProviderWrapper } from './components/growthbook-provider'
 import { getSession } from '@/lib/auth'
 
 export const metadata: Metadata = {
@@ -58,13 +59,15 @@ export default async function RootLayout({
     >
       <body className="antialiased max-w-xl mx-4 mt-8 lg:mx-auto bg-black">
         <SessionProvider session={session}>
-          <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
-            <Navbar />
-            {children}
-            <Footer />
-            <Analytics />
-            <SpeedInsights />
-          </main>
+          <GrowthBookProviderWrapper>
+            <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0">
+              <Navbar />
+              {children}
+              <Footer />
+              <Analytics />
+              <SpeedInsights />
+            </main>
+          </GrowthBookProviderWrapper>
         </SessionProvider>
       </body>
     </html>
