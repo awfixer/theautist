@@ -25,10 +25,13 @@ function parseFrontmatter(fileContent: string) {
     value = value.replace(/^['"](.*)['"]$/, '$1') // Remove quotes
     const trimmedKey = key.trim() as keyof Metadata
 
+    // Normalize value for boolean checks
+    const normalizedValue = value.trim().toLowerCase();
+
     // Handle boolean values
-    if (value === 'true') {
+    if (normalizedValue === 'true') {
       metadata[trimmedKey] = true as never
-    } else if (value === 'false') {
+    } else if (normalizedValue === 'false') {
       metadata[trimmedKey] = false as never
     } else {
       metadata[trimmedKey] = value as never
