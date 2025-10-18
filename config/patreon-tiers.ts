@@ -23,9 +23,9 @@ export interface PatreonTier {
  */
 export const PATREON_TIERS: PatreonTier[] = [
   {
-    id: 'ultimate',
-    name: 'Ultimate Supporter',
-    amountCents: 2000, // $20/month
+    id: 'eclipse-enigma',
+    name: 'Eclipse Enigma',
+    amountCents: 5000, // $20/month
     benefits: [
       'Access to all premium content',
       'Access to ultimate-tier exclusive posts',
@@ -35,9 +35,9 @@ export const PATREON_TIERS: PatreonTier[] = [
     color: 'purple',
   },
   {
-    id: 'premium',
-    name: 'Premium Supporter',
-    amountCents: 1000, // $10/month
+    id: 'vortex-vanguard',
+    name: 'Vortex Vanguard',
+    amountCents: 2500, // $10/month
     benefits: [
       'Access to premium content',
       'Access to premium-tier exclusive posts',
@@ -46,9 +46,9 @@ export const PATREON_TIERS: PatreonTier[] = [
     color: 'blue',
   },
   {
-    id: 'basic',
-    name: 'Basic Supporter',
-    amountCents: 500, // $5/month
+    id: 'nebula-nomad',
+    name: 'Nebula Nomad',
+    amountCents: 1300, // $5/month
     benefits: [
       'Access to basic tier content',
       'Support the work',
