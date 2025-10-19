@@ -52,7 +52,18 @@ export default function Footer() {
             <p className="ml-2 h-7">source</p>
           </a>
         </li>
-      </ul>
+  33    <li>
+  34      <a
+  35        className="flex items-center transition-all hover:text-neutral-100"
+  36        rel="noopener noreferrer"
+  37        target="_blank"
+  38        href="https://railway.com?referralCode=nyJTRu"
+  39      >
+  40        <ArrowIcon />
+  41        <p className="ml-2 h-7">railway</p>
+  42       </a>
+  43    </li>
+	</ul>
       <p className="mt-8 text-neutral-300">
         © {new Date().getFullYear()} MIT Licensed
       </p>
