@@ -42,9 +42,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     summary: description,
     image,
   } = post.metadata
-  const ogImage = image
-    ? image
-    : `${baseUrl}/og?title=${encodeURIComponent(title)}`
+  const ogImage = image || `${baseUrl}/og?title=${encodeURIComponent(title)}`
+
 
   return {
     title,
@@ -166,13 +165,15 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
       </div>
       <article className="prose">
         {showFullContent ? (
+        {showFullContent ? (
           <CustomMDX source={post.content} />
         ) : (
           <PaidPostGate requiredTier={requiredTier} userTier={userTier}>
-            <CustomMDX source={post.content} />
+            <div className="prose">
+              <p>{post.metadata.summary}</p>
+            </div>
           </PaidPostGate>
         )}
-      </article>
     </section>
   )
 }
