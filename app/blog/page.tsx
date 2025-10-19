@@ -1,13 +1,13 @@
 import { BlogSearch } from 'app/components/blog-search'
-import { getBlogPosts } from 'app/blog/utils'
+import { getAllPosts } from 'app/blog/utils'
 
 export const metadata = {
   title: 'Blog',
   description: 'Read my blog.',
 }
 
-export default function Page() {
-  const allPosts = getBlogPosts()
+export default async function Page() {
+  const allPosts = await getAllPosts()
 
   return (
     <section>

@@ -1,9 +1,9 @@
 import { baseUrl } from 'app/sitemap'
-import { getBlogPosts } from 'app/blog/utils'
+import { getAllPosts } from 'app/blog/utils'
 
 export async function GET() {
-  // getBlogPosts() automatically filters out drafts in production
-  const allBlogs = await getBlogPosts()
+  // getAllPosts() includes local and remote posts, filters out drafts in production
+  const allBlogs = await getAllPosts()
 
   const itemsXml = allBlogs
     .sort((a, b) => {

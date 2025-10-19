@@ -1,11 +1,15 @@
 import { notFound } from 'next/navigation'
 import { CustomMDX } from 'app/components/mdx'
-import { formatDate, getBlogPosts } from 'app/blog/utils'
+import { formatDate, getAllPosts } from 'app/blog/utils'
 import { baseUrl } from 'app/sitemap'
 import { getSession } from '@/lib/auth'
 import { PaidPostGate } from 'app/components/paid-post-gate'
 import { checkTierAccess } from '@/lib/tier-access'
 import { getTierById } from '@/config/patreon-tiers'
+
+// Enable ISR: Revalidate blog posts every hour (3600 seconds)
+// This allows premium content from remote repo to update without full rebuild
+export const revalidate = 3600
 
 /**
  * Static mapping for tier badge colors to ensure Tailwind generates these classes
@@ -22,7 +26,7 @@ function getTierBadgeClasses(color: string): string {
 }
 
 export async function generateStaticParams() {
-  const posts = getBlogPosts()
+  const posts = await getAllPosts()
 
   return posts.map((post) => ({
     slug: post.slug,
@@ -31,7 +35,8 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = getBlogPosts().find((post) => post.slug === slug)
+  const posts = await getAllPosts()
+  const post = posts.find((post) => post.slug === slug)
   if (!post) {
     return
   }
@@ -71,7 +76,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function Blog({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = getBlogPosts().find((post) => post.slug === slug)
+  const posts = await getAllPosts()
+  const post = posts.find((post) => post.slug === slug)
 
   if (!post) {
     notFound()
@@ -165,7 +171,6 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
       </div>
       <article className="prose">
         {showFullContent ? (
-        {showFullContent ? (
           <CustomMDX source={post.content} />
         ) : (
           <PaidPostGate requiredTier={requiredTier} userTier={userTier}>
@@ -174,6 +179,7 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
             </div>
           </PaidPostGate>
         )}
+      </article>
     </section>
   )
 }

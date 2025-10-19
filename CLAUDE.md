@@ -26,7 +26,12 @@ pnpm start
 
 ### Content System (File-Based Blog)
 
-The blog system reads MDX files from `app/blog/posts/` at build time. Posts are statically generated using `generateStaticParams()`.
+The blog system supports two content sources:
+
+1. **Local Posts**: MDX files in `app/blog/posts/` (committed to this repository)
+2. **Remote Posts**: MDX files fetched from a separate private GitHub repository (premium content)
+
+Posts are statically generated using `generateStaticParams()` and refreshed hourly via ISR.
 
 **Blog Post Format:**
 ```mdx
@@ -37,6 +42,7 @@ summary: "Brief description"
 image: "/optional-image.jpg"
 draft: false        # Optional: hide in production (default: false)
 paid: false         # Optional: require Patreon auth (default: false)
+tier: "premium"     # Optional: specific Patreon tier requirement
 ---
 
 MDX content here...
@@ -45,15 +51,18 @@ MDX content here...
 **Post Features:**
 - **Draft Posts** (`draft: true`): Only visible in development, excluded from production builds, sitemap, and RSS
 - **Paid Posts** (`paid: true`): Require Patreon authentication, show paywall to unauthenticated users
-- See `BLOG_FEATURES.md` for complete documentation
+- **Remote Posts**: Fetched from separate GitHub repo, merged with local posts
+- See `BLOG_FEATURES.md` and `REMOTE_CONTENT.md` for complete documentation
 
 **Key Files:**
 - `app/blog/utils.ts`: Core blog logic
-  - `getBlogPosts()`: Reads all MDX files from posts directory
+  - `getBlogPosts()`: Reads local MDX files from posts directory
+  - `getAllPosts()`: Merges local + remote posts (use this for most cases)
   - `parseFrontmatter()`: Extracts YAML frontmatter from MDX
   - `formatDate()`: Formats dates with relative time (e.g., "3mo ago")
-- `app/blog/[slug]/page.tsx`: Dynamic blog post routes with metadata generation
-- `app/blog/posts/*.mdx`: Individual blog posts (filename becomes slug)
+- `lib/remote-content.ts`: GitHub API utilities for fetching premium posts
+- `app/blog/[slug]/page.tsx`: Dynamic blog post routes with ISR revalidation (1 hour)
+- `app/blog/posts/*.mdx`: Local blog posts (filename becomes slug)
 
 ### MDX Rendering Pipeline
 
@@ -303,13 +312,28 @@ Type-Safe Features:
 ## Deployment Notes
 
 - Site is designed for Vercel deployment (Analytics + Speed Insights integrated)
-- All routes are statically generated at build time (no SSR except auth)
+- All routes are statically generated at build time with ISR for blog posts (1 hour revalidation)
 - Build must succeed without errors (`pnpm build`)
 - TypeScript strict mode errors will fail the build
-- **Auth Environment Variables**: Must be configured in deployment platform
-  - Use different `AUTH_SECRET` for production
+
+**Environment Variables:**
+
+- **Auth (NextAuth.js)**: Must be configured in deployment platform
+  - Use different `AUTH_SECRET` for production (generate with `npx auth secret`)
   - Update Patreon OAuth redirect URIs for production domain
   - Set `NEXTAUTH_URL` to production URL
-- **GrowthBook Environment Variables**: Must be configured in deployment platform
+  - Set `PATREON_CLIENT_ID` and `PATREON_CLIENT_SECRET`
+
+- **GrowthBook**: Must be configured in deployment platform
   - Set `NEXT_PUBLIC_GROWTHBOOK_CLIENT_KEY` from GrowthBook dashboard
   - Optionally set `NEXT_PUBLIC_GROWTHBOOK_API_HOST` for self-hosted instances
+
+- **Remote Content (Premium Posts)**: Optional, for premium blog content from separate repo
+  - Create fine-grained GitHub PAT with read-only Contents permission
+  - Set `PREMIUM_REPO_OWNER` (GitHub username/org)
+  - Set `PREMIUM_REPO_NAME` (repository name)
+  - Set `PREMIUM_REPO_TOKEN` (fine-grained PAT starting with `ghp_`)
+  - Set `PREMIUM_REPO_BRANCH` (default: `main`)
+  - Set `PREMIUM_POSTS_PATH` (default: `posts`)
+  - See `REMOTE_CONTENT.md` for complete setup instructions
+  - If not configured, site works normally with local posts only

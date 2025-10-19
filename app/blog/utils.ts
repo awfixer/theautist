@@ -12,7 +12,14 @@ type Metadata = {
   tier?: string // Patreon tier required for access (basic, premium, ultimate)
 }
 
-function parseFrontmatter(fileContent: string) {
+export type Post = {
+  metadata: Metadata
+  slug: string
+  content: string
+  source: 'local' | 'remote'
+}
+
+export function parseFrontmatter(fileContent: string) {
   const frontmatterRegex = /---\s*([\s\S]*?)\s*---/
   const match = frontmatterRegex.exec(fileContent)
   const frontMatterBlock = match![1]
@@ -51,7 +58,7 @@ function readMDXFile(filePath: string): { metadata: Metadata; content: string } 
   return parseFrontmatter(rawContent)
 }
 
-function getMDXData(dir: string) {
+function getMDXData(dir: string): Post[] {
   const mdxFiles = getMDXFiles(dir)
   return mdxFiles.map((file) => {
     const { metadata, content } = readMDXFile(path.join(dir, file))
@@ -62,11 +69,12 @@ function getMDXData(dir: string) {
       metadata,
       slug,
       content,
+      source: 'local' as const,
     }
   })
 }
 
-export function getBlogPosts() {
+export function getBlogPosts(): Post[] {
   const allPosts = getMDXData(path.join(process.cwd(), 'app', 'blog', 'posts'))
 
   // Filter out drafts if configured (defaults to true in production)
@@ -76,6 +84,38 @@ export function getBlogPosts() {
   if (shouldFilterDrafts) {
     return allPosts.filter((post) => !post.metadata.draft)
   }
+
+  return allPosts
+}
+
+/**
+ * Get all blog posts including local and remote (premium) posts
+ *
+ * This function merges posts from:
+ * - Local filesystem (app/blog/posts/)
+ * - Remote GitHub repository (premium content)
+ *
+ * Remote posts are fetched from a separate private repository if configured.
+ * If remote fetching fails or is not configured, only local posts are returned.
+ *
+ * @returns Combined array of local and remote posts, sorted by publishedAt date
+ */
+export async function getAllPosts(): Promise<Post[]> {
+  // Dynamic import to avoid circular dependency and reduce bundle size
+  const { getRemotePosts } = await import('@/lib/remote-content')
+
+  // Get local posts (synchronous)
+  const localPosts = getBlogPosts()
+
+  // Get remote posts (asynchronous, may return empty array)
+  const remotePosts = await getRemotePosts()
+
+  // Merge and sort by publishedAt date (newest first)
+  const allPosts = [...localPosts, ...remotePosts].sort((a, b) => {
+    const dateA = new Date(a.metadata.publishedAt)
+    const dateB = new Date(b.metadata.publishedAt)
+    return dateB.getTime() - dateA.getTime()
+  })
 
   return allPosts
 }
