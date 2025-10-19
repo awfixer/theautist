@@ -74,8 +74,25 @@ function getMDXData(dir: string): Post[] {
   })
 }
 
+/**
+ * Get blog posts from local filesystem (DEPRECATED)
+ *
+ * This function is kept for backward compatibility but is deprecated.
+ * All content should now be stored in the remote content repository.
+ * Use getAllPosts() instead.
+ *
+ * @deprecated Use getAllPosts() which fetches from remote content repository
+ */
 export function getBlogPosts(): Post[] {
-  const allPosts = getMDXData(path.join(process.cwd(), 'app', 'blog', 'posts'))
+  const postsDir = path.join(process.cwd(), 'app', 'blog', 'posts')
+
+  // Check if posts directory exists
+  if (!fs.existsSync(postsDir)) {
+    console.warn('Local posts directory does not exist. Use remote content repository.')
+    return []
+  }
+
+  const allPosts = getMDXData(postsDir)
 
   // Filter out drafts if configured (defaults to true in production)
   const shouldFilterDrafts = process.env.FILTER_DRAFTS === 'true' ||
@@ -89,35 +106,42 @@ export function getBlogPosts(): Post[] {
 }
 
 /**
- * Get all blog posts including local and remote (premium) posts
+ * Get all blog posts from remote content repository
  *
- * This function merges posts from:
- * - Local filesystem (app/blog/posts/)
- * - Remote GitHub repository (premium content)
+ * This is the primary function for fetching blog posts. All content is stored
+ * in a separate GitHub repository and fetched at build time via GitHub API.
  *
- * Remote posts are fetched from a separate private repository if configured.
- * If remote fetching fails or is not configured, only local posts are returned.
+ * For backward compatibility, this function also checks for local posts if
+ * remote fetching fails or is not configured, but this is deprecated.
  *
- * @returns Combined array of local and remote posts, sorted by publishedAt date
+ * @returns Array of posts from remote repository, sorted by publishedAt date (newest first)
  */
 export async function getAllPosts(): Promise<Post[]> {
   // Dynamic import to avoid circular dependency and reduce bundle size
   const { getRemotePosts } = await import('@/lib/remote-content')
 
-  // Get local posts (synchronous)
-  const localPosts = getBlogPosts()
-
-  // Get remote posts (asynchronous, may return empty array)
+  // Get remote posts (primary source)
   const remotePosts = await getRemotePosts()
 
-  // Merge and sort by publishedAt date (newest first)
-  const allPosts = [...localPosts, ...remotePosts].sort((a, b) => {
+  // If remote posts are available, use only those
+  if (remotePosts.length > 0) {
+    // Sort by publishedAt date (newest first)
+    return remotePosts.sort((a, b) => {
+      const dateA = new Date(a.metadata.publishedAt)
+      const dateB = new Date(b.metadata.publishedAt)
+      return dateB.getTime() - dateA.getTime()
+    })
+  }
+
+  // Fallback to local posts only if remote is not configured or failed
+  console.warn('No remote posts found. Falling back to local posts (deprecated).')
+  const localPosts = getBlogPosts()
+
+  return localPosts.sort((a, b) => {
     const dateA = new Date(a.metadata.publishedAt)
     const dateB = new Date(b.metadata.publishedAt)
     return dateB.getTime() - dateA.getTime()
   })
-
-  return allPosts
 }
 
 export function formatDate(date: string, includeRelative = false) {

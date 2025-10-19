@@ -1,7 +1,8 @@
 /**
  * Remote Content Fetching
  *
- * Fetches premium blog posts from a separate GitHub repository.
+ * Fetches blog posts from a separate GitHub repository.
+ * All content is stored in a dedicated content repository.
  * Uses GitHub API with fine-grained personal access token.
  */
 
@@ -41,6 +42,7 @@ export type RemotePost = {
     image?: string
     draft?: boolean
     paid?: boolean
+    tier?: string
   }
   slug: string
   content: string
@@ -116,18 +118,20 @@ const cache = new RemoteContentCache(process.env.NODE_ENV === 'development' ? 60
 
 /**
  * Get remote repository configuration from environment variables
+ * Supports both new (CONTENT_*) and legacy (PREMIUM_*) variable names
  * @throws {RemoteContentConfigError} If required env vars are missing
  */
 export function getRemoteRepoConfig(): RemoteRepoConfig {
-  const owner = process.env.PREMIUM_REPO_OWNER
-  const repo = process.env.PREMIUM_REPO_NAME
-  const token = process.env.PREMIUM_REPO_TOKEN
-  const branch = process.env.PREMIUM_REPO_BRANCH || 'main'
-  const path = process.env.PREMIUM_POSTS_PATH || 'posts'
+  // Try new variable names first, fallback to legacy names
+  const owner = process.env.CONTENT_REPO_OWNER || process.env.PREMIUM_REPO_OWNER
+  const repo = process.env.CONTENT_REPO_NAME || process.env.PREMIUM_REPO_NAME
+  const token = process.env.CONTENT_REPO_TOKEN || process.env.PREMIUM_REPO_TOKEN
+  const branch = process.env.CONTENT_REPO_BRANCH || process.env.PREMIUM_REPO_BRANCH || 'main'
+  const path = process.env.CONTENT_POSTS_PATH || process.env.PREMIUM_POSTS_PATH || 'posts'
 
   if (!owner || !repo || !token) {
     throw new RemoteContentConfigError(
-      'Missing required environment variables: PREMIUM_REPO_OWNER, PREMIUM_REPO_NAME, PREMIUM_REPO_TOKEN'
+      'Missing required environment variables: CONTENT_REPO_OWNER, CONTENT_REPO_NAME, CONTENT_REPO_TOKEN (or legacy PREMIUM_* equivalents)'
     )
   }
 
@@ -258,7 +262,7 @@ async function parseRemotePost(slug: string, rawContent: string): Promise<Remote
 // ============================================================================
 
 /**
- * Fetch all remote posts from the premium repository
+ * Fetch all remote posts from the content repository
  *
  * Returns empty array if:
  * - Environment variables not configured
@@ -280,7 +284,7 @@ export async function getRemotePosts(): Promise<RemotePost[]> {
     const config = getRemoteRepoConfig()
 
     // Fetch directory listing
-    console.log(`Fetching remote posts from ${config.owner}/${config.repo}/${config.path}`)
+    console.log(`Fetching posts from ${config.owner}/${config.repo}/${config.path}`)
     const files = await fetchGitHubDirectory(config)
 
     // Filter for .mdx files only
@@ -289,11 +293,11 @@ export async function getRemotePosts(): Promise<RemotePost[]> {
     )
 
     if (mdxFiles.length === 0) {
-      console.warn('No .mdx files found in remote repository')
+      console.warn('No .mdx files found in content repository')
       return []
     }
 
-    console.log(`Found ${mdxFiles.length} remote post(s)`)
+    console.log(`Found ${mdxFiles.length} post(s)`)
 
     // Fetch and parse all files in parallel
     const posts = await Promise.all(
@@ -308,7 +312,7 @@ export async function getRemotePosts(): Promise<RemotePost[]> {
           // Parse into post
           return await parseRemotePost(slug, content)
         } catch (error) {
-          console.error(`Failed to process remote post ${file.name}:`, error)
+          console.error(`Failed to process post ${file.name}:`, error)
           return null
         }
       })
@@ -323,8 +327,8 @@ export async function getRemotePosts(): Promise<RemotePost[]> {
     return validPosts
   } catch (error) {
     if (error instanceof RemoteContentConfigError) {
-      // Configuration missing - this is expected in development
-      console.warn('Remote content not configured, skipping premium posts')
+      // Configuration missing - this is expected in development without content repo
+      console.warn('Remote content repository not configured')
     } else if (error instanceof GitHubAPIError) {
       // API error - log but don't fail build
       console.error('GitHub API error:', error.message)

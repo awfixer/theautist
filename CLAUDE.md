@@ -24,14 +24,11 @@ pnpm start
 
 ## Architecture
 
-### Content System (File-Based Blog)
+### Content System (Remote Content Repository)
 
-The blog system supports two content sources:
+**All blog content is stored in a separate GitHub repository.** This repository contains only source code.
 
-1. **Local Posts**: MDX files in `app/blog/posts/` (committed to this repository)
-2. **Remote Posts**: MDX files fetched from a separate private GitHub repository (premium content)
-
-Posts are statically generated using `generateStaticParams()` and refreshed hourly via ISR.
+Posts are fetched from the remote content repository via GitHub API at build time and refreshed hourly via ISR. The content repository keeps source code and content completely separate for better organization and independent updates.
 
 **Blog Post Format:**
 ```mdx
@@ -51,18 +48,18 @@ MDX content here...
 **Post Features:**
 - **Draft Posts** (`draft: true`): Only visible in development, excluded from production builds, sitemap, and RSS
 - **Paid Posts** (`paid: true`): Require Patreon authentication, show paywall to unauthenticated users
-- **Remote Posts**: Fetched from separate GitHub repo, merged with local posts
-- See `BLOG_FEATURES.md` and `REMOTE_CONTENT.md` for complete documentation
+- **Remote-Only Content**: All posts fetched from GitHub content repository
+- See `BLOG_FEATURES.md` and `CONTENT_REPOSITORY.md` for complete documentation
 
 **Key Files:**
 - `app/blog/utils.ts`: Core blog logic
-  - `getBlogPosts()`: Reads local MDX files from posts directory
-  - `getAllPosts()`: Merges local + remote posts (use this for most cases)
+  - `getAllPosts()`: Fetches posts from remote content repository (primary function)
+  - `getBlogPosts()`: Legacy local fallback (deprecated)
   - `parseFrontmatter()`: Extracts YAML frontmatter from MDX
   - `formatDate()`: Formats dates with relative time (e.g., "3mo ago")
-- `lib/remote-content.ts`: GitHub API utilities for fetching premium posts
+- `lib/remote-content.ts`: GitHub API utilities for fetching content from remote repository
 - `app/blog/[slug]/page.tsx`: Dynamic blog post routes with ISR revalidation (1 hour)
-- `app/blog/posts/*.mdx`: Local blog posts (filename becomes slug)
+- `app/blog/posts/`: Deprecated local posts directory (for fallback only)
 
 ### MDX Rendering Pipeline
 
@@ -154,11 +151,20 @@ function formatDate(date, includeRelative) {  // Implicit any
 
 ### Adding New Blog Posts
 
-1. Create `app/blog/posts/new-post-slug.mdx`
-2. Add frontmatter (title, publishedAt, summary required)
-3. Write content in MDX format
-4. Run `pnpm build` to verify (post auto-discovered via file system)
-5. No code changes needed - slug comes from filename
+**Important: All blog posts must be added to the remote content repository, not this code repository.**
+
+1. Go to your content repository (e.g., `theautist-content`)
+2. Create `posts/new-post-slug.mdx` in the content repo
+3. Add frontmatter (title, publishedAt, summary required)
+4. Write content in MDX format
+5. Commit and push to the content repository
+6. Run `pnpm build` in this repository to fetch and verify
+7. Posts are auto-discovered via GitHub API - no code changes needed
+
+**For local testing without content repo:**
+- Posts can temporarily be placed in `app/blog/posts/` (deprecated)
+- System will fall back to local posts if remote fetch fails
+- Always migrate to content repository for production
 
 ### Updating Site Metadata
 
@@ -328,12 +334,13 @@ Type-Safe Features:
   - Set `NEXT_PUBLIC_GROWTHBOOK_CLIENT_KEY` from GrowthBook dashboard
   - Optionally set `NEXT_PUBLIC_GROWTHBOOK_API_HOST` for self-hosted instances
 
-- **Remote Content (Premium Posts)**: Optional, for premium blog content from separate repo
+- **Remote Content Repository (REQUIRED)**: All blog content stored in separate GitHub repository
   - Create fine-grained GitHub PAT with read-only Contents permission
-  - Set `PREMIUM_REPO_OWNER` (GitHub username/org)
-  - Set `PREMIUM_REPO_NAME` (repository name)
-  - Set `PREMIUM_REPO_TOKEN` (fine-grained PAT starting with `ghp_`)
-  - Set `PREMIUM_REPO_BRANCH` (default: `main`)
-  - Set `PREMIUM_POSTS_PATH` (default: `posts`)
-  - See `REMOTE_CONTENT.md` for complete setup instructions
-  - If not configured, site works normally with local posts only
+  - Set `CONTENT_REPO_OWNER` (GitHub username/org)
+  - Set `CONTENT_REPO_NAME` (repository name)
+  - Set `CONTENT_REPO_TOKEN` (fine-grained PAT starting with `ghp_`)
+  - Set `CONTENT_REPO_BRANCH` (default: `main`)
+  - Set `CONTENT_POSTS_PATH` (default: `posts`)
+  - See `CONTENT_REPOSITORY.md` for complete setup instructions
+  - Legacy `PREMIUM_*` variables still supported for backward compatibility
+  - If not configured, falls back to deprecated local posts directory
