@@ -27,14 +27,21 @@ export const authConfig: NextAuthConfig = {
 
         // Fetch Patreon membership data
         try {
+          // Set up abort controller with 10 second timeout
+          const controller = new AbortController()
+          const timeout = setTimeout(() => controller.abort(), 10000)
+
           const response = await fetch(
             'https://www.patreon.com/api/oauth2/v2/identity?include=memberships&fields[member]=currently_entitled_amount_cents,patron_status',
             {
               headers: {
                 Authorization: `Bearer ${account.access_token}`,
               },
+              signal: controller.signal,
             }
           )
+
+          clearTimeout(timeout)
 
           if (response.ok) {
             const data = await response.json()
@@ -60,8 +67,12 @@ export const authConfig: NextAuthConfig = {
               token.patronStatus = activeMembership.attributes.patron_status
             }
           }
-        } catch (error) {
-          console.error('Failed to fetch Patreon membership data:', error)
+        } catch (error: unknown) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            console.error('Patreon API request timed out')
+          } else {
+            console.error('Failed to fetch Patreon membership data:', error)
+          }
         }
       }
       return token

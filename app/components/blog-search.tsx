@@ -13,6 +13,7 @@ type BlogPost = {
     image?: string
     draft?: boolean
     paid?: boolean
+    tier?: string
   }
   slug: string
   content: string
@@ -78,7 +79,7 @@ export function BlogSearch({ posts }: { posts: BlogPost[] }) {
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <CardTitle className="text-lg text-white">{post.metadata.title}</CardTitle>
-                      {post.metadata.paid && (
+                      {(post.metadata.paid || post.metadata.tier) && (
                         <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
                           <svg
                             className="w-3 h-3 mr-1"

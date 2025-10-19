@@ -7,6 +7,20 @@ import { PaidPostGate } from 'app/components/paid-post-gate'
 import { checkTierAccess } from '@/lib/tier-access'
 import { getTierById } from '@/config/patreon-tiers'
 
+/**
+ * Static mapping for tier badge colors to ensure Tailwind generates these classes
+ */
+function getTierBadgeClasses(color: string): string {
+  const colorMap: Record<string, string> = {
+    purple: 'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-purple-500/10 text-purple-500 border border-purple-500/20',
+    blue: 'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20',
+    green: 'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-500/10 text-green-500 border border-green-500/20',
+    yellow: 'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20',
+    red: 'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-500/10 text-red-500 border border-red-500/20',
+  }
+  return colorMap[color] || colorMap.yellow
+}
+
 export async function generateStaticParams() {
   const posts = getBlogPosts()
 
@@ -104,7 +118,7 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
           {post.metadata.title}
         </h1>
         {isPaidPost && tierInfo && (
-          <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-${tierInfo.color}-500/10 text-${tierInfo.color}-500 border border-${tierInfo.color}-500/20`}>
+          <span className={getTierBadgeClasses(tierInfo.color)}>
             <svg
               className="w-3 h-3 mr-1"
               fill="none"

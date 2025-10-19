@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import slugify from 'slugify'
 
 type Metadata = {
   title: string
@@ -54,7 +55,8 @@ function getMDXData(dir: string) {
   const mdxFiles = getMDXFiles(dir)
   return mdxFiles.map((file) => {
     const { metadata, content } = readMDXFile(path.join(dir, file))
-    const slug = path.basename(file, path.extname(file)).replace(/[^a-zA-Z0-9-_]/g, '').toLowerCase()
+    const baseName = path.basename(file, path.extname(file))
+    const slug = slugify(baseName, { lower: true, strict: true })
 
     return {
       metadata,
@@ -67,8 +69,11 @@ function getMDXData(dir: string) {
 export function getBlogPosts() {
   const allPosts = getMDXData(path.join(process.cwd(), 'app', 'blog', 'posts'))
 
-  // Filter out drafts in production
-  if (process.env.NODE_ENV === 'production') {
+  // Filter out drafts if configured (defaults to true in production)
+  const shouldFilterDrafts = process.env.FILTER_DRAFTS === 'true' ||
+    (process.env.FILTER_DRAFTS === undefined && process.env.NODE_ENV === 'production')
+
+  if (shouldFilterDrafts) {
     return allPosts.filter((post) => !post.metadata.draft)
   }
 
