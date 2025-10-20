@@ -61,9 +61,9 @@ export default function Footer() {
           >
             <ArrowIcon />
             <p className="ml-2 h-7">railway</p>
-           </a>
+          </a>
         </li>
-	</ul>
+      </ul>
       <p className="mt-8 text-neutral-300">
         © {new Date().getFullYear()} MIT Licensed
       </p>

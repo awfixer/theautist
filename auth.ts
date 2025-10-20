@@ -81,7 +81,7 @@ export const authConfig: NextAuthConfig = {
       // Send properties to the client
       if (session.user) {
         session.user.id = token.sub as string
-        session.user.patreonId = token.patreonId as string
+        session.user.patreonId = token.patreonId as string | undefined
         session.user.pledgeAmountCents = token.pledgeAmountCents as number | undefined
         session.user.patronStatus = token.patronStatus as string | undefined
       }

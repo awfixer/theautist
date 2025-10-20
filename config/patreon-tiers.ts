@@ -25,7 +25,7 @@ export const PATREON_TIERS: PatreonTier[] = [
   {
     id: 'eclipse-enigma',
     name: 'Eclipse Enigma',
-    amountCents: 5000, // $50/month
+    amountCents: 2000, // $20/month
     benefits: [
       'Access to all premium content',
       'Access to ultimate-tier exclusive posts',
@@ -37,7 +37,7 @@ export const PATREON_TIERS: PatreonTier[] = [
   {
     id: 'vortex-vanguard',
     name: 'Vortex Vanguard',
-    amountCents: 2500, // $25/month
+    amountCents: 1000, // $10/month
     benefits: [
       'Access to premium content',
       'Access to premium-tier exclusive posts',
@@ -48,7 +48,7 @@ export const PATREON_TIERS: PatreonTier[] = [
   {
     id: 'nebula-nomad',
     name: 'Nebula Nomad',
-    amountCents: 1300, // $13/month
+    amountCents: 500, // $5/month
     benefits: [
       'Access to basic tier content',
       'Support the work',
