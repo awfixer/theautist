@@ -1,0 +1,41 @@
+---
+title: 'Example Draft Post'
+publishedAt: '2025-10-17'
+summary: 'This is an example draft post that only appears in development mode.'
+draft: true
+---
+
+# Example Draft Post
+
+This post demonstrates the **draft** feature. It's only visible when running `pnpm dev` in development mode.
+
+## How Draft Posts Work
+
+When you set `draft: true` in the frontmatter:
+
+- ✅ Visible in development mode with a blue "Draft" badge
+- ❌ Hidden in production builds
+- ❌ Not included in sitemap.xml
+- ❌ Not included in RSS feed
+
+## Use Cases
+
+Draft posts are perfect for:
+
+1. **Work in Progress** - Write and preview before publishing
+2. **Content Planning** - Keep upcoming posts in the repository
+3. **Team Reviews** - Share drafts with collaborators
+4. **Testing** - Try out new formatting or features
+
+## Publishing This Post
+
+To make this post live, simply remove the `draft: true` line from the frontmatter, or change it to `draft: false`.
+
+```mdx
+---
+title: 'Now Published!'
+publishedAt: '2025-10-17'
+summary: 'This post is now public'
+# draft: true  ← Remove this line
+---
+```

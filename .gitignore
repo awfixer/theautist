@@ -35,3 +35,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local posts (deprecated - use content repository instead)
+# Keep directory structure but ignore post content
+app/blog/posts/*.mdx
+!app/blog/posts/README.md
+!app/blog/posts/.gitkeep
+
+# Sentry Config File
+.env.sentry-build-plugin

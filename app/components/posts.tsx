@@ -3,7 +3,7 @@ import { formatDate, getBlogPosts } from 'app/blog/utils'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/app/components/ui/card'
 
 export function BlogPosts({ limit }: { limit?: number }) {
-  let allBlogs = getBlogPosts()
+  const allBlogs = getBlogPosts()
 
   return (
     <div className="space-y-4">
