@@ -4,7 +4,7 @@ declare module "next-auth" {
   interface Session {
     user: {
       id: string
-      patreonId: string
+      patreonId?: string
       pledgeAmountCents?: number
       patronStatus?: string
     } & DefaultSession["user"]
