@@ -49,6 +49,17 @@ export type RemotePost = {
   source: 'remote'
 }
 
+export type Project = {
+  name: string
+  description: string
+  url?: string
+  repo?: string
+  image?: string
+  tags?: string[]
+  status?: 'active' | 'archived' | 'planning'
+  featured?: boolean
+}
+
 // ============================================================================
 // Errors
 // ============================================================================
@@ -335,6 +346,99 @@ export async function getRemotePosts(): Promise<RemotePost[]> {
     } else {
       // Unexpected error
       console.error('Unexpected error fetching remote posts:', error)
+    }
+
+    return []
+  }
+}
+
+/**
+ * Fetch projects from the content repository
+ *
+ * Projects are stored in a JSON file (e.g., projects.json) at the root
+ * or in a projects directory of the content repository.
+ *
+ * Returns empty array if:
+ * - Environment variables not configured
+ * - GitHub API request fails
+ * - projects.json not found or invalid
+ *
+ * Errors are logged but don't throw to allow graceful degradation.
+ */
+export async function getRemoteProjects(): Promise<Project[]> {
+  // Check cache first
+  const cached = cache.get<Project[]>('remote-projects')
+  if (cached) {
+    console.log('Returning cached remote projects')
+    return cached
+  }
+
+  try {
+    // Get configuration
+    const config = getRemoteRepoConfig()
+
+    // Try projects.json at root first, then projects/projects.json
+    const possiblePaths = ['projects.json', 'projects/projects.json']
+
+    for (const projectPath of possiblePaths) {
+      try {
+        console.log(`Fetching projects from ${config.owner}/${config.repo}/${projectPath}`)
+
+        const url = `https://api.github.com/repos/${config.owner}/${config.repo}/contents/${projectPath}?ref=${config.branch}`
+
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${config.token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'theautist-blog',
+          },
+          // Cache for 5 minutes during builds
+          next: { revalidate: 300 },
+        })
+
+        if (!response.ok) {
+          continue // Try next path
+        }
+
+        const data = await response.json()
+
+        if (!data.content || data.encoding !== 'base64') {
+          continue // Try next path
+        }
+
+        // Decode base64 content
+        const content = Buffer.from(data.content, 'base64').toString('utf-8')
+        const projects = JSON.parse(content) as Project[]
+
+        if (!Array.isArray(projects)) {
+          console.warn(`projects.json is not an array`)
+          return []
+        }
+
+        console.log(`Found ${projects.length} project(s)`)
+
+        // Update cache
+        cache.set('remote-projects', projects)
+
+        return projects
+      } catch {
+        // Continue to next path if this location fails
+        continue
+      }
+    }
+
+    console.warn('No projects.json found in content repository')
+    return []
+  } catch (error) {
+    if (error instanceof RemoteContentConfigError) {
+      // Configuration missing - this is expected in development without content repo
+      console.warn('Remote content repository not configured for projects')
+    } else if (error instanceof GitHubAPIError) {
+      // API error - log but don't fail build
+      console.error('GitHub API error fetching projects:', error.message)
+    } else {
+      // Unexpected error
+      console.error('Unexpected error fetching remote projects:', error)
     }
 
     return []

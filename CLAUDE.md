@@ -26,9 +26,9 @@ pnpm start
 
 ### Content System (Remote Content Repository)
 
-**All blog content is stored in a separate GitHub repository.** This repository contains only source code.
+**All blog content and projects are stored in a separate GitHub repository.** This repository contains only source code.
 
-Posts are fetched from the remote content repository via GitHub API at build time and refreshed hourly via ISR. The content repository keeps source code and content completely separate for better organization and independent updates.
+Posts and projects are fetched from the remote content repository via GitHub API at build time and refreshed hourly via ISR. The content repository keeps source code and content completely separate for better organization and independent updates.
 
 **Blog Post Format:**
 ```mdx
@@ -51,6 +51,22 @@ MDX content here...
 - **Remote-Only Content**: All posts fetched from GitHub content repository
 - See `BLOG_FEATURES.md` and `CONTENT_REPOSITORY.md` for complete documentation
 
+**Projects Format:**
+```json
+[
+  {
+    "name": "Project Name",
+    "description": "Project description",
+    "url": "https://project-url.com",
+    "repo": "https://github.com/username/repo",
+    "image": "/images/project.jpg",
+    "tags": ["Next.js", "TypeScript"],
+    "status": "active",
+    "featured": true
+  }
+]
+```
+
 **Key Files:**
 - `app/blog/utils.ts`: Core blog logic
   - `getAllPosts()`: Fetches posts from remote content repository (primary function)
@@ -58,7 +74,10 @@ MDX content here...
   - `parseFrontmatter()`: Extracts YAML frontmatter from MDX
   - `formatDate()`: Formats dates with relative time (e.g., "3mo ago")
 - `lib/remote-content.ts`: GitHub API utilities for fetching content from remote repository
+  - `getRemotePosts()`: Fetch blog posts from content repo
+  - `getRemoteProjects()`: Fetch projects from content repo (projects.json)
 - `app/blog/[slug]/page.tsx`: Dynamic blog post routes with ISR revalidation (1 hour)
+- `app/projects/page.tsx`: Projects page with ISR revalidation (1 hour)
 - `app/blog/posts/`: Deprecated local posts directory (for fallback only)
 
 ### MDX Rendering Pipeline
@@ -165,6 +184,20 @@ function formatDate(date, includeRelative) {  // Implicit any
 - Posts can temporarily be placed in `app/blog/posts/` (deprecated)
 - System will fall back to local posts if remote fetch fails
 - Always migrate to content repository for production
+
+### Adding New Projects
+
+**Important: Projects must be added to the remote content repository, not this code repository.**
+
+1. Go to your content repository (e.g., `theautist-content`)
+2. Create or edit `projects.json` (or `projects/projects.json`)
+3. Add project objects with required fields (name, description)
+4. Optionally add url, repo, image, tags, status, and featured fields
+5. Commit and push to the content repository
+6. Run `pnpm build` in this repository to fetch and verify
+7. Visit `/projects` to see your projects
+
+**Example backup:** See `claudedocs/content-backup/projects.json.example` for a complete example
 
 ### Updating Site Metadata
 
@@ -334,13 +367,14 @@ Type-Safe Features:
   - Set `NEXT_PUBLIC_GROWTHBOOK_CLIENT_KEY` from GrowthBook dashboard
   - Optionally set `NEXT_PUBLIC_GROWTHBOOK_API_HOST` for self-hosted instances
 
-- **Remote Content Repository (REQUIRED)**: All blog content stored in separate GitHub repository
+- **Remote Content Repository (REQUIRED)**: All blog content and projects stored in separate GitHub repository
   - Create fine-grained GitHub PAT with read-only Contents permission
   - Set `CONTENT_REPO_OWNER` (GitHub username/org)
   - Set `CONTENT_REPO_NAME` (repository name)
   - Set `CONTENT_REPO_TOKEN` (fine-grained PAT starting with `ghp_`)
   - Set `CONTENT_REPO_BRANCH` (default: `main`)
   - Set `CONTENT_POSTS_PATH` (default: `posts`)
+  - Projects stored in `projects.json` at repository root or `projects/projects.json`
   - See `CONTENT_REPOSITORY.md` for complete setup instructions
   - Legacy `PREMIUM_*` variables still supported for backward compatibility
-  - If not configured, falls back to deprecated local posts directory
+  - If not configured, falls back to deprecated local posts directory (projects will be empty)

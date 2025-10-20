@@ -18,10 +18,11 @@ This document describes the remote content fetching system that stores all blog 
 
 ### Components
 
-- **`lib/remote-content.ts`**: GitHub API utilities for fetching content
+- **`lib/remote-content.ts`**: GitHub API utilities for fetching content (posts and projects)
 - **`app/blog/utils.ts`**: Post fetching with remote-first approach
+- **`app/projects/page.tsx`**: Projects page with remote content support
 - **Build-time Fetch**: Content fetched during `pnpm build`
-- **ISR Revalidation**: Posts refresh every 1 hour (configurable)
+- **ISR Revalidation**: Posts and projects refresh every 1 hour (configurable)
 - **Graceful Degradation**: Falls back to local posts if remote fetch fails
 
 ### Data Flow
@@ -127,7 +128,42 @@ You can use all MDX features:
 - **paid** (optional): Require Patreon authentication
 - **tier** (optional): Specific Patreon tier requirement (basic, premium, ultimate)
 
-### 5. Test Locally
+### 5. Create Projects File (Optional)
+
+In addition to blog posts, you can showcase your projects by creating a `projects.json` file:
+
+```json
+[
+  {
+    "name": "Project Name",
+    "description": "A brief description of what this project does",
+    "url": "https://project-url.com",
+    "repo": "https://github.com/username/repo",
+    "image": "/images/project.jpg",
+    "tags": ["Next.js", "TypeScript", "React"],
+    "status": "active",
+    "featured": true
+  }
+]
+```
+
+**Project Properties:**
+- **name** (required): Project name displayed as title
+- **description** (required): Brief description of the project
+- **url** (optional): Live project URL
+- **repo** (optional): GitHub repository URL
+- **image** (optional): Path to project thumbnail (relative to public/)
+- **tags** (optional): Array of technology/topic tags
+- **status** (optional): `active`, `archived`, or `planning`
+- **featured** (optional): Highlight special projects with a star badge
+
+**File Location Options:**
+- `projects.json` at repository root
+- `projects/projects.json` in a projects directory
+
+The system automatically tries both locations.
+
+### 6. Test Locally
 
 ```bash
 # Build with remote content
@@ -136,12 +172,17 @@ pnpm build
 # You should see in the logs:
 # "Fetching posts from owner/repo/posts"
 # "Found X post(s)"
+# "Fetching projects from owner/repo/projects.json"
+# "Found Y project(s)"
 
 # Start production server
 pnpm start
 
 # Visit http://localhost:3000/blog
 # Posts should appear in the list
+
+# Visit http://localhost:3000/projects
+# Projects should be displayed in a grid
 ```
 
 ## Usage
@@ -176,6 +217,34 @@ import { getAllPosts } from '@/app/blog/utils'
 const posts = await getAllPosts()
 
 // Posts are pre-sorted by publishedAt (newest first)
+```
+
+### Accessing Projects
+
+```typescript
+import { getRemoteProjects } from '@/lib/remote-content'
+
+// Get all projects from remote repository
+const projects = await getRemoteProjects()
+
+// Projects are returned in the order defined in projects.json
+```
+
+### Project Data Structure
+
+All projects have this structure:
+
+```typescript
+type Project = {
+  name: string              // Project name (required)
+  description: string       // Brief description (required)
+  url?: string             // Live project URL
+  repo?: string            // GitHub repository URL
+  image?: string           // Path to project thumbnail
+  tags?: string[]          // Technology/topic tags
+  status?: 'active' | 'archived' | 'planning'
+  featured?: boolean       // Show featured badge
+}
 ```
 
 ### ISR Configuration
@@ -407,6 +476,23 @@ async function getRemotePosts(): Promise<RemotePost[]>
 
 **Errors**: All errors caught and logged, never throws
 
+### `getRemoteProjects()`
+
+Fetch all projects from GitHub content repository.
+
+```typescript
+async function getRemoteProjects(): Promise<Project[]>
+```
+
+**Returns**: Array of projects, or empty array if:
+- Environment variables not configured
+- GitHub API request fails
+- projects.json not found or invalid
+
+**Errors**: All errors caught and logged, never throws
+
+**Note**: Automatically tries both `projects.json` and `projects/projects.json` paths
+
 ### `getAllPosts()`
 
 Get all blog posts (remote-first, local fallback).
@@ -419,7 +505,7 @@ async function getAllPosts(): Promise<Post[]>
 
 ### `clearRemoteContentCache()`
 
-Clear the in-memory cache.
+Clear the in-memory cache for both posts and projects.
 
 ```typescript
 function clearRemoteContentCache(): void
