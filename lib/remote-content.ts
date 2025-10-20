@@ -132,6 +132,27 @@ const cache = new RemoteContentCache(process.env.NODE_ENV === 'development' ? 60
  * Supports both new (CONTENT_*) and legacy (PREMIUM_*) variable names
  * @throws {RemoteContentConfigError} If required env vars are missing
  */
+
+/**
+ * Validates remote repo configuration parameters
+ * Only allows valid GitHub usernames/repo names/paths (no traversal, no punctuation)
+ * Throws RemoteContentConfigError if invalid.
+ */
+function validateRemoteRepoConfig(owner: string, repo: string, path: string) {
+  // GitHub usernames and repo names: alphanumeric, dash, underscore, dot, max 100 chars
+  const NAME_REGEX = /^[A-Za-z0-9_.-]{1,100}$/
+  if (!NAME_REGEX.test(owner)) {
+    throw new RemoteContentConfigError('Invalid CONTENT_REPO_OWNER/PREMIUM_REPO_OWNER.')
+  }
+  if (!NAME_REGEX.test(repo)) {
+    throw new RemoteContentConfigError('Invalid CONTENT_REPO_NAME/PREMIUM_REPO_NAME.')
+  }
+  // Path must not contain '..' or start with '/' and only contain safe chars (directory/file/underscore/dash/dot/letters/numbers)
+  if (typeof path !== 'string' || path.length > 200 || path.includes('..') || path.startsWith('/') || /[~$<>]/.test(path)) {
+    throw new RemoteContentConfigError('Invalid CONTENT_POSTS_PATH/PREMIUM_POSTS_PATH.')
+  }
+}
+
 export function getRemoteRepoConfig(): RemoteRepoConfig {
   // Try new variable names first, fallback to legacy names
   const owner = process.env.CONTENT_REPO_OWNER || process.env.PREMIUM_REPO_OWNER
@@ -145,6 +166,8 @@ export function getRemoteRepoConfig(): RemoteRepoConfig {
       'Missing required environment variables: CONTENT_REPO_OWNER, CONTENT_REPO_NAME, CONTENT_REPO_TOKEN (or legacy PREMIUM_* equivalents)'
     )
   }
+  // Validate input
+  validateRemoteRepoConfig(owner, repo, path)
 
   return { owner, repo, token, branch, path }
 }
