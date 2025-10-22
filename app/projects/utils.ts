@@ -4,17 +4,10 @@ import slugify from 'slugify'
 
 type Metadata = {
   title: string
+  description: string
   publishedAt: string
-  summary: string
-  image?: string
-  draft?: boolean
-  paid?: boolean
-  tier?: string // Patreon tier required for access (basic, premium, ultimate)
-  url?: string // Live demo URL
-  repo?: string // GitHub repository URL
-  tags?: string[] // Technology tags
-  status?: 'active' | 'archived' | 'planning' // Project status
-  featured?: boolean // Featured project
+  image: string
+  link: string
 }
 
 export type Project = {
@@ -94,14 +87,6 @@ function getLocalProjects(): Project[] {
   }
 
   const allProjects = getMDXData(projectsDir)
-
-  // Filter out drafts if configured (defaults to true in production)
-  const shouldFilterDrafts = process.env.FILTER_DRAFTS === 'true' ||
-    (process.env.FILTER_DRAFTS === undefined && process.env.NODE_ENV === 'production')
-
-  if (shouldFilterDrafts) {
-    return allProjects.filter((project) => !project.metadata.draft)
-  }
 
   return allProjects
 }

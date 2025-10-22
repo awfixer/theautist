@@ -1,27 +1,11 @@
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import { CustomMDX } from 'app/components/mdx'
 import { formatDate, getAllProjects } from 'app/projects/utils'
 import { baseUrl } from 'app/sitemap'
-import { PaidPostGate } from 'app/components/paid-post-gate'
-import { getTierById } from '@/config/patreon-tiers'
+import { Button } from '@/app/components/ui/button'
 
-// Enable ISR: Revalidate projects every hour (3600 seconds)
-// This allows premium content from remote repo to update without full rebuild
 export const revalidate = 3600
-
-/**
- * Static mapping for tier badge colors to ensure Tailwind generates these classes
- */
-function getTierBadgeClasses(color: string): string {
-  const colorMap: Record<string, string> = {
-    purple: 'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-purple-500/10 text-purple-500 border border-purple-500/20',
-    blue: 'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20',
-    green: 'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-500/10 text-green-500 border border-green-500/20',
-    yellow: 'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20',
-    red: 'inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-red-500/10 text-red-500 border border-red-500/20',
-  }
-  return colorMap[color] || colorMap.yellow
-}
 
 export async function generateStaticParams() {
   const projects = await getAllProjects()
@@ -42,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const {
     title,
     publishedAt: publishedTime,
-    summary: description,
+    description,
     image,
   } = project.metadata
   const ogImage = image || `${baseUrl}/og?title=${encodeURIComponent(title)}`
@@ -81,13 +65,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     notFound()
   }
 
-  const requiredTier = project.metadata.tier
-  const isPaidProject = project.metadata.paid === true || !!requiredTier
-  const showFullContent = !isPaidProject
-
-  // Get tier information for display
-  const tierInfo = requiredTier ? getTierById(requiredTier) : undefined
-
   return (
     <section>
       <script
@@ -100,10 +77,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             headline: project.metadata.title,
             datePublished: project.metadata.publishedAt,
             dateModified: project.metadata.publishedAt,
-            description: project.metadata.summary,
-            image: project.metadata.image
-              ? `${baseUrl}${project.metadata.image}`
-              : `/og?title=${encodeURIComponent(project.metadata.title)}`,
+            description: project.metadata.description,
+            image: project.metadata.image,
             url: `${baseUrl}/projects/${project.slug}`,
             author: {
               '@type': 'Person',
@@ -112,67 +87,39 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           }),
         }}
       />
-      <div className="flex items-center gap-2 mb-2">
+      
+      <div className="relative h-64 w-full mb-6 rounded-lg overflow-hidden">
+        <Image
+          src={project.metadata.image}
+          alt={project.metadata.title}
+          fill
+          className="object-cover"
+        />
+      </div>
+
+      <div className="flex items-center justify-between mb-6">
         <h1 className="title font-semibold text-2xl tracking-tighter text-white">
           {project.metadata.title}
         </h1>
-        {isPaidProject && tierInfo && (
-          <span className={getTierBadgeClasses(tierInfo.color)}>
-            <svg
-              className="w-3 h-3 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-              />
-            </svg>
-            {tierInfo.name}
-          </span>
-        )}
-        {isPaidProject && !tierInfo && (
-          <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
-            <svg
-              className="w-3 h-3 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-              />
-            </svg>
-            Patreon
-          </span>
-        )}
-        {project.metadata.draft && (
-          <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20">
-            Draft
-          </span>
-        )}
+        <a href={project.metadata.link} target="_blank" rel="noopener noreferrer">
+          <Button>
+            Visit Project
+          </Button>
+        </a>
       </div>
+
       <div className="flex justify-between items-center mt-2 mb-8 text-sm">
         <p className="text-sm text-neutral-400">
           {formatDate(project.metadata.publishedAt)}
         </p>
       </div>
+
+      <div className="mb-6">
+        <p className="text-neutral-300">{project.metadata.description}</p>
+      </div>
+
       <article className="prose">
-        {showFullContent ? (
-          <CustomMDX source={project.content} />
-        ) : (
-          <PaidPostGate requiredTier={requiredTier}>
-            <div className="prose">
-              <p>{project.metadata.summary}</p>
-            </div>
-          </PaidPostGate>
-        )}
+        <CustomMDX source={project.content} />
       </article>
     </section>
   )
