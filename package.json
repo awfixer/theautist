@@ -59,7 +59,7 @@
     "jiti": "^2.6.1",
     "lint-staged": "^16.2.4",
     "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.17",
+    "tailwindcss": "^4.0.0",
     "typescript-eslint": "^8.46.1"
   }
 }
