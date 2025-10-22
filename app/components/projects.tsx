@@ -21,14 +21,16 @@ export function ProjectList({ limit }: { limit?: number }) {
         .slice(0, limit)
         .map((project) => (
           <Card key={project.slug} className="transition-all hover:shadow-md">
-            <div className="relative h-48 w-full">
-              <Image
-                src={project.metadata.image}
-                alt={project.metadata.title}
-                fill
-                className="object-cover rounded-t-lg"
-              />
-            </div>
+            {project.metadata.image && (
+              <div className="relative h-48 w-full">
+                <Image
+                  src={project.metadata.image}
+                  alt={project.metadata.title}
+                  fill
+                  className="object-cover rounded-t-lg"
+                />
+              </div>
+            )}
             <CardHeader>
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                 <CardTitle className="text-lg text-white">{project.metadata.title}</CardTitle>

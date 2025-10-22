@@ -7,7 +7,11 @@
       "Bash(timeout 30s npm run dev)",
       "Bash(npm run lint)",
       "Bash(mv:*)",
-      "Bash(timeout 60s npm run build)"
+      "Bash(timeout 60s npm run build)",
+      "Bash(time pnpm build)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(timeout 300s pnpm run build)"
     ],
     "deny": [],
     "ask": []

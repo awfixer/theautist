@@ -4,6 +4,7 @@
     "lint": "eslint . --fix",
     "dev": "next dev",
     "build": "next build",
+    "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "prepare": "husky"
   },

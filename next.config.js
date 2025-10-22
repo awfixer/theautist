@@ -1,7 +1,28 @@
 const { withSentryConfig } = require("@sentry/nextjs");
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  experimental: {
+    // Enable optimizations for faster builds
+    optimizePackageImports: ['@radix-ui/react-slot', 'lucide-react', 'clsx'],
+  },
+  // Enable static optimization
+  output: 'standalone',
+  // Optimize images
+  images: {
+    formats: ['image/webp', 'image/avif'],
+  },
+  // Reduce bundle size
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{member}}',
+    },
+  },
+  // Enable build caching
+  generateBuildId: async () => {
+    return process.env.BUILD_ID || 'build'
+  },
+};
 
 module.exports = withSentryConfig(
   nextConfig,

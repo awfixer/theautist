@@ -5,6 +5,12 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  // Enable JIT mode for faster compilation
+  mode: 'jit',
+  // Disable unused features for faster builds
+  corePlugins: {
+    preflight: true,
+  },
   theme: {
     extend: {
       borderRadius: {

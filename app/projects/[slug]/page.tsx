@@ -88,14 +88,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         }}
       />
       
-      <div className="relative h-64 w-full mb-6 rounded-lg overflow-hidden">
-        <Image
-          src={project.metadata.image}
-          alt={project.metadata.title}
-          fill
-          className="object-cover"
-        />
-      </div>
+      {project.metadata.image && (
+        <div className="relative h-64 w-full mb-6 rounded-lg overflow-hidden">
+          <Image
+            src={project.metadata.image}
+            alt={project.metadata.title}
+            fill
+            className="object-cover"
+          />
+        </div>
+      )}
 
       <div className="flex items-center justify-between mb-6">
         <h1 className="title font-semibold text-2xl tracking-tighter text-white">

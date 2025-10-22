@@ -4,10 +4,19 @@ import slugify from 'slugify'
 
 type Metadata = {
   title: string
-  description: string
+  description?: string
   publishedAt: string
-  image: string
-  link: string
+  image?: string
+  link?: string
+  summary?: string
+  draft?: boolean
+  paid?: boolean
+  tier?: string
+  url?: string
+  repo?: string
+  tags?: string[]
+  status?: 'active' | 'archived' | 'planning'
+  featured?: boolean
 }
 
 export type Project = {
@@ -101,8 +110,13 @@ function getLocalProjects(): Project[] {
  */
 export function getAllProjects(): Project[] {
   const localProjects = getLocalProjects()
+  
+  // Filter out drafts in production if FILTER_DRAFTS is true
+  const filteredProjects = process.env.NODE_ENV === 'production' && process.env.FILTER_DRAFTS !== 'false'
+    ? localProjects.filter(project => !project.metadata.draft)
+    : localProjects
 
-  return localProjects.sort((a, b) => {
+  return filteredProjects.sort((a, b) => {
     const dateA = new Date(a.metadata.publishedAt)
     const dateB = new Date(b.metadata.publishedAt)
     return dateB.getTime() - dateA.getTime()
