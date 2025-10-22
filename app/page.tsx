@@ -13,7 +13,10 @@ export default function Page() {
 	that button up there at the top`}
       </p>
       <p className="mb-4">
-        {'this site only gets new features when i have a chance. You will not often find new features added as I am usually working on other projects that require more of my time. Check out the source code via the link at the bottom if you would like to see how it is going over there.'}
+        {'you can visit hackertalks if you want to find out more information. This site is just infomation about me. there is digital ocean and railway referral links at the bottom of the page that help me if you click them'}
+      </p>
+      <p className="md-4">
+      {'im the founder, lead engineer, and principle engineer for AWFixerOS, which is meantioned in one of the project pages, so I encourage you to go check that out.'}
       </p>
       <div className="my-8">
         <ProjectList limit={3} />
