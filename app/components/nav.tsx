@@ -1,13 +1,11 @@
 import Link from 'next/link'
-import { AuthButton } from './auth-button'
-import { getSession } from '@/lib/auth'
 
 const navItems = {
   '/': {
     name: 'home',
   },
-  '/blog': {
-    name: 'blog',
+  '/projects': {
+    name: 'projects',
   },
   'https://inv.wtf/deadinside': {
     name: 'discord',
@@ -17,9 +15,7 @@ const navItems = {
   },
 }
 
-export async function Navbar(): Promise<JSX.Element> {
-  const session = await getSession()
-
+export function Navbar(): JSX.Element {
   return (
     <aside className="-ml-[8px] mb-16 tracking-tight">
       <div className="lg:sticky lg:top-20">
@@ -40,7 +36,6 @@ export async function Navbar(): Promise<JSX.Element> {
               )
             })}
           </div>
-          <AuthButton session={session} />
         </nav>
       </div>
     </aside>

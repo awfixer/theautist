@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { getTierById, formatTierAmount, hasAccess } from '@/config/patreon-tiers'
 
 interface PaidPostGateProps {
@@ -96,8 +95,10 @@ export function PaidPostGate({ children, requiredTier, userTier }: PaidPostGateP
                     ))}
                   </ul>
                 </div>
-                <Link
-                  href="/api/auth/signin"
+                <a
+                  href="https://www.patreon.com/awfixer"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center mt-4 px-4 py-2 bg-[#FF424D] hover:bg-[#E03C46] text-white font-medium rounded-lg transition-colors"
                 >
                   <svg
@@ -107,8 +108,8 @@ export function PaidPostGate({ children, requiredTier, userTier }: PaidPostGateP
                   >
                     <path d="M15.386.524c-4.764 0-8.64 3.876-8.64 8.64 0 4.75 3.876 8.613 8.64 8.613 4.75 0 8.614-3.864 8.614-8.613C24 4.4 20.136.524 15.386.524M.003 23.537h4.22V.524H.003" />
                   </svg>
-                  Sign in with Patreon
-                </Link>
+                  Support on Patreon
+                </a>
               </>
             ) : (
               <>
@@ -116,11 +117,12 @@ export function PaidPostGate({ children, requiredTier, userTier }: PaidPostGateP
                   Patreon-Only Content
                 </h3>
                 <p className="text-neutral-400 mb-4">
-                  This post is exclusively available to my Patreon supporters. Sign in with
-                  your Patreon account to unlock the full content.
+                  This post is exclusively available to my Patreon supporters.
                 </p>
-                <Link
-                  href="/api/auth/signin"
+                <a
+                  href="https://www.patreon.com/awfixer"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center px-4 py-2 bg-[#FF424D] hover:bg-[#E03C46] text-white font-medium rounded-lg transition-colors"
                 >
                   <svg
@@ -130,8 +132,8 @@ export function PaidPostGate({ children, requiredTier, userTier }: PaidPostGateP
                   >
                     <path d="M15.386.524c-4.764 0-8.64 3.876-8.64 8.64 0 4.75 3.876 8.613 8.64 8.613 4.75 0 8.614-3.864 8.614-8.613C24 4.4 20.136.524 15.386.524M.003 23.537h4.22V.524H.003" />
                   </svg>
-                  Sign in with Patreon
-                </Link>
+                  Support on Patreon
+                </a>
               </>
             )}
           </div>

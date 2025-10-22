@@ -1,19 +1,19 @@
-import { getAllPosts } from 'app/blog/utils'
+import { getAllProjects } from 'app/projects/utils'
 
 export const baseUrl = 'https://theautist.me'
 
 export default async function sitemap() {
-  // getAllPosts() includes local and remote posts, filters out drafts in production
-  const posts = await getAllPosts()
-  const blogs = posts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: post.metadata.publishedAt,
+  // getAllProjects() includes local and remote projects, filters out drafts in production
+  const projects = await getAllProjects()
+  const projectPages = projects.map((project) => ({
+    url: `${baseUrl}/projects/${project.slug}`,
+    lastModified: project.metadata.publishedAt,
   }))
 
-  const routes = ['', '/blog', '/projects'].map((route) => ({
+  const routes = ['', '/projects'].map((route) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date().toISOString().split('T')[0],
   }))
 
-  return [...routes, ...blogs]
+  return [...routes, ...projectPages]
 }

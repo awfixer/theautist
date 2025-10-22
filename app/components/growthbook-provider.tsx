@@ -2,8 +2,6 @@
 
 import { GrowthBook, GrowthBookProvider } from '@growthbook/growthbook-react'
 import { useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { getUserTier } from '@/lib/tier-access'
 
 // Initialize GrowthBook singleton
 const growthbook = new GrowthBook({
@@ -25,36 +23,16 @@ export function GrowthBookProviderWrapper({
 }: {
   children: React.ReactNode
 }): React.ReactElement {
-  const { data: session, status } = useSession()
-
   useEffect(() => {
     // Load features from GrowthBook API
     growthbook.loadFeatures()
-  }, [])
-
-  useEffect(() => {
-    // Update user attributes when session changes
-    if (status === 'loading') return
-
-    const pledgeAmount = session?.user?.pledgeAmountCents
-    const userTier = getUserTier(pledgeAmount)
-    const isActivePatron = session?.user?.patronStatus === 'active_patron'
-
+    
+    // Set default anonymous attributes
     growthbook.setAttributes({
-      id: session?.user?.id || 'anonymous',
-      loggedIn: !!session,
-      patreonId: session?.user?.patreonId,
-      email: session?.user?.email,
-      // Patreon tier attributes for targeting
-      patreonTier: userTier,
-      pledgeAmountCents: pledgeAmount,
-      isActivePatron,
-      // Tier-specific booleans for easy targeting
-      isBasicTier: userTier === 'basic',
-      isPremiumTier: userTier === 'premium',
-      isUltimateTier: userTier === 'ultimate',
+      id: 'anonymous',
+      loggedIn: false,
     })
-  }, [session, status])
+  }, [])
 
   return (
     <GrowthBookProvider growthbook={growthbook}>

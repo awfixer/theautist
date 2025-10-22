@@ -10,9 +10,14 @@ type Metadata = {
   draft?: boolean
   paid?: boolean
   tier?: string // Patreon tier required for access (basic, premium, ultimate)
+  url?: string // Live demo URL
+  repo?: string // GitHub repository URL
+  tags?: string[] // Technology tags
+  status?: 'active' | 'archived' | 'planning' // Project status
+  featured?: boolean // Featured project
 }
 
-export type Post = {
+export type Project = {
   metadata: Metadata
   slug: string
   content: string
@@ -58,7 +63,7 @@ function readMDXFile(filePath: string): { metadata: Metadata; content: string } 
   return parseFrontmatter(rawContent)
 }
 
-function getMDXData(dir: string): Post[] {
+function getMDXData(dir: string): Project[] {
   const mdxFiles = getMDXFiles(dir)
   return mdxFiles.map((file) => {
     const { metadata, content } = readMDXFile(path.join(dir, file))
@@ -75,69 +80,44 @@ function getMDXData(dir: string): Post[] {
 }
 
 /**
- * Get blog posts from local filesystem (DEPRECATED)
+ * Get projects from local filesystem
  *
- * This function is kept for backward compatibility but is deprecated.
- * All content should now be stored in the remote content repository.
- * Use getAllPosts() instead.
- *
- * @deprecated Use getAllPosts() which fetches from remote content repository
+ * This function loads projects from the local posts directory.
  */
-export function getBlogPosts(): Post[] {
-  const postsDir = path.join(process.cwd(), 'app', 'blog', 'posts')
+function getLocalProjects(): Project[] {
+  const projectsDir = path.join(process.cwd(), 'app', 'projects', 'posts')
 
-  // Check if posts directory exists
-  if (!fs.existsSync(postsDir)) {
-    console.warn('Local posts directory does not exist. Use remote content repository.')
+  // Check if projects directory exists
+  if (!fs.existsSync(projectsDir)) {
+    console.warn('Local projects directory does not exist.')
     return []
   }
 
-  const allPosts = getMDXData(postsDir)
+  const allProjects = getMDXData(projectsDir)
 
   // Filter out drafts if configured (defaults to true in production)
   const shouldFilterDrafts = process.env.FILTER_DRAFTS === 'true' ||
     (process.env.FILTER_DRAFTS === undefined && process.env.NODE_ENV === 'production')
 
   if (shouldFilterDrafts) {
-    return allPosts.filter((post) => !post.metadata.draft)
+    return allProjects.filter((project) => !project.metadata.draft)
   }
 
-  return allPosts
+  return allProjects
 }
 
 /**
- * Get all blog posts from remote content repository
+ * Get all projects from local filesystem
  *
- * This is the primary function for fetching blog posts. All content is stored
- * in a separate GitHub repository and fetched at build time via GitHub API.
+ * This is the primary function for fetching projects. All content is stored
+ * locally in the projects/posts directory.
  *
- * For backward compatibility, this function also checks for local posts if
- * remote fetching fails or is not configured, but this is deprecated.
- *
- * @returns Array of posts from remote repository, sorted by publishedAt date (newest first)
+ * @returns Array of projects sorted by publishedAt date (newest first)
  */
-export async function getAllPosts(): Promise<Post[]> {
-  // Dynamic import to avoid circular dependency and reduce bundle size
-  const { getRemotePosts } = await import('@/lib/remote-content')
+export function getAllProjects(): Project[] {
+  const localProjects = getLocalProjects()
 
-  // Get remote posts (primary source)
-  const remotePosts = await getRemotePosts()
-
-  // If remote posts are available, use only those
-  if (remotePosts.length > 0) {
-    // Sort by publishedAt date (newest first)
-    return remotePosts.sort((a, b) => {
-      const dateA = new Date(a.metadata.publishedAt)
-      const dateB = new Date(b.metadata.publishedAt)
-      return dateB.getTime() - dateA.getTime()
-    })
-  }
-
-  // Fallback to local posts only if remote is not configured or failed
-  console.warn('No remote posts found. Falling back to local posts (deprecated).')
-  const localPosts = getBlogPosts()
-
-  return localPosts.sort((a, b) => {
+  return localProjects.sort((a, b) => {
     const dateA = new Date(a.metadata.publishedAt)
     const dateB = new Date(b.metadata.publishedAt)
     return dateB.getTime() - dateA.getTime()

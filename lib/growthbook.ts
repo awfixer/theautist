@@ -36,7 +36,7 @@ export function useFeatureVariant<T extends string | number | boolean>(
  */
 export type FeatureFlags = {
   // Example feature flags:
-  'new-blog-design': boolean
+  'new-project-design': boolean
   'paid-content-preview': boolean
   'dark-mode-toggle': boolean
   'experimental-search': boolean
@@ -46,7 +46,7 @@ export type FeatureFlags = {
  * Type-safe hook for feature flags
  *
  * @example
- * const isEnabled = useTypedFeature('new-blog-design')
+ * const isEnabled = useTypedFeature('new-project-design')
  */
 export function useTypedFeature(flag: keyof FeatureFlags): boolean {
   return useFeatureIsOn(flag)
