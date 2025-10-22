@@ -19,7 +19,7 @@ export default function Page() {
       {'im the founder, lead engineer, and principle engineer for AWFixerOS, which is meantioned in one of the project pages, so I encourage you to go check that out.'}
       </p>
       <p className="mb-4">
-      {'it should also be known that I am working on ways to detect and block various bots that tend to scrape websites. The ways im playing with tend to be non-invasive though if you find youself blocked, mention that to me in my discord and I will do my best to locate your traffic and explain it you you :)'}
+      {'it should also be known that I am working on ways to detect and block various bots that tend to scrape websites. The ways im playing with tend to be non-invasive though if you find youself blocked, mention that to me in my discord and I will do my best to locate your traffic and explain it you :)'}
       </p>
       <div className="my-8">
         <ProjectList limit={3} />
