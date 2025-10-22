@@ -1,13 +1,11 @@
 import { notFound } from 'next/navigation'
 import { CustomMDX } from 'app/components/mdx'
-import { formatDate, getAllPosts } from 'app/blog/utils'
+import { formatDate, getAllProjects } from 'app/projects/utils'
 import { baseUrl } from 'app/sitemap'
-import { getSession } from '@/lib/auth'
 import { PaidPostGate } from 'app/components/paid-post-gate'
-import { checkTierAccess } from '@/lib/tier-access'
 import { getTierById } from '@/config/patreon-tiers'
 
-// Enable ISR: Revalidate blog posts every hour (3600 seconds)
+// Enable ISR: Revalidate projects every hour (3600 seconds)
 // This allows premium content from remote repo to update without full rebuild
 export const revalidate = 3600
 
@@ -26,18 +24,18 @@ function getTierBadgeClasses(color: string): string {
 }
 
 export async function generateStaticParams() {
-  const posts = await getAllPosts()
+  const projects = await getAllProjects()
 
-  return posts.map((post) => ({
-    slug: post.slug,
+  return projects.map((project) => ({
+    slug: project.slug,
   }))
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const posts = await getAllPosts()
-  const post = posts.find((post) => post.slug === slug)
-  if (!post) {
+  const projects = await getAllProjects()
+  const project = projects.find((project) => project.slug === slug)
+  if (!project) {
     return
   }
 
@@ -46,7 +44,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     publishedAt: publishedTime,
     summary: description,
     image,
-  } = post.metadata
+  } = project.metadata
   const ogImage = image || `${baseUrl}/og?title=${encodeURIComponent(title)}`
 
 
@@ -58,7 +56,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       type: 'article',
       publishedTime,
-      url: `${baseUrl}/blog/${post.slug}`,
+      url: `${baseUrl}/projects/${project.slug}`,
       images: [
         {
           url: ogImage,
@@ -74,22 +72,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 }
 
-export default async function Blog({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const posts = await getAllPosts()
-  const post = posts.find((post) => post.slug === slug)
+  const projects = await getAllProjects()
+  const project = projects.find((project) => project.slug === slug)
 
-  if (!post) {
+  if (!project) {
     notFound()
   }
 
-  const session = await getSession()
-  const requiredTier = post.metadata.tier
-  const isPaidPost = post.metadata.paid === true || !!requiredTier
-
-  // Check tier-based access
-  const { hasAccess, userTier } = await checkTierAccess(session, requiredTier)
-  const showFullContent = !isPaidPost || hasAccess
+  const requiredTier = project.metadata.tier
+  const isPaidProject = project.metadata.paid === true || !!requiredTier
+  const showFullContent = !isPaidProject
 
   // Get tier information for display
   const tierInfo = requiredTier ? getTierById(requiredTier) : undefined
@@ -102,15 +96,15 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             '@context': 'https://schema.org',
-            '@type': 'BlogPosting',
-            headline: post.metadata.title,
-            datePublished: post.metadata.publishedAt,
-            dateModified: post.metadata.publishedAt,
-            description: post.metadata.summary,
-            image: post.metadata.image
-              ? `${baseUrl}${post.metadata.image}`
-              : `/og?title=${encodeURIComponent(post.metadata.title)}`,
-            url: `${baseUrl}/blog/${post.slug}`,
+            '@type': 'Article',
+            headline: project.metadata.title,
+            datePublished: project.metadata.publishedAt,
+            dateModified: project.metadata.publishedAt,
+            description: project.metadata.summary,
+            image: project.metadata.image
+              ? `${baseUrl}${project.metadata.image}`
+              : `/og?title=${encodeURIComponent(project.metadata.title)}`,
+            url: `${baseUrl}/projects/${project.slug}`,
             author: {
               '@type': 'Person',
               name: 'My Portfolio',
@@ -120,9 +114,9 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
       />
       <div className="flex items-center gap-2 mb-2">
         <h1 className="title font-semibold text-2xl tracking-tighter text-white">
-          {post.metadata.title}
+          {project.metadata.title}
         </h1>
-        {isPaidPost && tierInfo && (
+        {isPaidProject && tierInfo && (
           <span className={getTierBadgeClasses(tierInfo.color)}>
             <svg
               className="w-3 h-3 mr-1"
@@ -140,7 +134,7 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
             {tierInfo.name}
           </span>
         )}
-        {isPaidPost && !tierInfo && (
+        {isPaidProject && !tierInfo && (
           <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
             <svg
               className="w-3 h-3 mr-1"
@@ -158,7 +152,7 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
             Patreon
           </span>
         )}
-        {post.metadata.draft && (
+        {project.metadata.draft && (
           <span className="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20">
             Draft
           </span>
@@ -166,16 +160,16 @@ export default async function Blog({ params }: { params: Promise<{ slug: string 
       </div>
       <div className="flex justify-between items-center mt-2 mb-8 text-sm">
         <p className="text-sm text-neutral-400">
-          {formatDate(post.metadata.publishedAt)}
+          {formatDate(project.metadata.publishedAt)}
         </p>
       </div>
       <article className="prose">
         {showFullContent ? (
-          <CustomMDX source={post.content} />
+          <CustomMDX source={project.content} />
         ) : (
-          <PaidPostGate requiredTier={requiredTier} userTier={userTier}>
+          <PaidPostGate requiredTier={requiredTier}>
             <div className="prose">
-              <p>{post.metadata.summary}</p>
+              <p>{project.metadata.summary}</p>
             </div>
           </PaidPostGate>
         )}

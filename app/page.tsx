@@ -1,4 +1,4 @@
-import { BlogPosts } from 'app/components/posts'
+import { ProjectList } from 'app/components/projects'
 
 export default function Page() {
   return (
@@ -13,10 +13,10 @@ export default function Page() {
 	that button up there at the top`}
       </p>
       <p className="mb-4">
-        {'this blog only gets new features when i have a chance. You will not often find new features added as I am usually working on other projects that require more of my time. Check out the source code via the link at the bottom if you would like to see how it is going over there.'}
+        {'this site only gets new features when i have a chance. You will not often find new features added as I am usually working on other projects that require more of my time. Check out the source code via the link at the bottom if you would like to see how it is going over there.'}
       </p>
       <div className="my-8">
-        <BlogPosts limit={3} />
+        <ProjectList limit={3} />
       </div>
     </section>
   )

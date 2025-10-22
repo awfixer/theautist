@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm:*)",
+      "Bash(npm run build:*)",
+      "Bash(pnpm install:*)",
+      "Bash(timeout 30s npm run dev)",
+      "Bash(npm run lint)",
+      "Bash(mv:*)",
+      "Bash(timeout 60s npm run build)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

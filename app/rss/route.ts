@@ -1,11 +1,11 @@
 import { baseUrl } from 'app/sitemap'
-import { getAllPosts } from 'app/blog/utils'
+import { getAllProjects } from 'app/projects/utils'
 
 export async function GET() {
-  // getAllPosts() includes local and remote posts, filters out drafts in production
-  const allBlogs = await getAllPosts()
+  // getAllProjects() includes local and remote projects, filters out drafts in production
+  const allProjects = await getAllProjects()
 
-  const itemsXml = allBlogs
+  const itemsXml = allProjects
     .sort((a, b) => {
       if (new Date(a.metadata.publishedAt) > new Date(b.metadata.publishedAt)) {
         return -1
@@ -13,13 +13,13 @@ export async function GET() {
       return 1
     })
     .map(
-      (post) =>
+      (project) =>
         `<item>
-          <title>${post.metadata.title}</title>
-          <link>${baseUrl}/blog/${post.slug}</link>
-          <description>${post.metadata.summary || ''}</description>
+          <title>${project.metadata.title}</title>
+          <link>${baseUrl}/projects/${project.slug}</link>
+          <description>${project.metadata.summary || ''}</description>
           <pubDate>${new Date(
-            post.metadata.publishedAt
+            project.metadata.publishedAt
           ).toUTCString()}</pubDate>
         </item>`
     )
@@ -28,9 +28,9 @@ export async function GET() {
   const rssFeed = `<?xml version="1.0" encoding="UTF-8" ?>
   <rss version="2.0">
     <channel>
-        <title>My Portfolio</title>
+        <title>My Projects</title>
         <link>${baseUrl}</link>
-        <description>This is my portfolio RSS feed</description>
+        <description>This is my projects RSS feed</description>
         ${itemsXml}
     </channel>
   </rss>`
