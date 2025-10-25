@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@flags-sdk/growthbook':
         specifier: ^0.1.0
-        version: 0.1.0(@opentelemetry/api@1.9.0)(next@16.0.0(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
+        version: 0.1.1(@opentelemetry/api@1.9.0)(next@16.0.0(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
       '@growthbook/growthbook-react':
         specifier: ^1.6.1
         version: 1.6.1(react@19.2.0)
@@ -303,8 +303,8 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@flags-sdk/growthbook@0.1.0':
-    resolution: {integrity: sha512-ZN6gMVD1z1uxsDdlA5gkrchF17rTnSm8vkVXKoqQ4PkSL/a3VWJBiUckU/8Jzf2cbF7OLsbyn4dMJFXL/5YnCw==}
+  '@flags-sdk/growthbook@0.1.1':
+    resolution: {integrity: sha512-qHhM6LrGgyNqQjicFBL2iclHGOb1UvKB0RU7IPfeGQCAKAsxh9mnhcZc5OA9T9+gbhNFoInmL1xFCGniORhx7A==}
 
   '@growthbook/growthbook-react@1.6.1':
     resolution: {integrity: sha512-ZxE0R+TslhTymMjyJiLMgvrKxZ+DqPzDuUjN8dZdAJQtlGUnGDn99pcF7lwYStZBPVZ3ncwNCQ9piEqU3i7AXg==}
@@ -1345,8 +1345,8 @@ packages:
   '@vercel/edge-config-fs@0.1.0':
     resolution: {integrity: sha512-NRIBwfcS0bUoUbRWlNGetqjvLSwgYH/BqKqDN7vK1g32p7dN96k0712COgaz6VFizAm9b0g6IG6hR6+hc0KCPg==}
 
-  '@vercel/edge-config@1.4.2':
-    resolution: {integrity: sha512-hUTqMLNxs/PEtuvOX67JoN84B3Z8mpSkMTCoMJ4g4G0DrAc3sNu1cUlsFatHOlxQdZLM4iipY7w28qZP4Vy26g==}
+  '@vercel/edge-config@1.4.3':
+    resolution: {integrity: sha512-8vTDATodRrH49wMzKEjZ8/5H2qs1aPkD0uRK585f/Fx4YN2wfHfY/3td9OFrh+gdnCq07z8A5f0hoY6xhBcPkg==}
     engines: {node: '>=14.6'}
     peerDependencies:
       '@opentelemetry/api': ^1.7.0
@@ -3950,10 +3950,10 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@flags-sdk/growthbook@0.1.0(@opentelemetry/api@1.9.0)(next@16.0.0(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))':
+  '@flags-sdk/growthbook@0.1.1(@opentelemetry/api@1.9.0)(next@16.0.0(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))':
     dependencies:
       '@growthbook/growthbook': 1.6.1
-      '@vercel/edge-config': 1.4.2(@opentelemetry/api@1.9.0)(next@16.0.0(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
+      '@vercel/edge-config': 1.4.3(@opentelemetry/api@1.9.0)(next@16.0.0(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))
       '@vercel/functions': 1.6.0
     transitivePeerDependencies:
       - '@aws-sdk/credential-provider-web-identity'
@@ -5051,7 +5051,7 @@ snapshots:
 
   '@vercel/edge-config-fs@0.1.0': {}
 
-  '@vercel/edge-config@1.4.2(@opentelemetry/api@1.9.0)(next@16.0.0(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))':
+  '@vercel/edge-config@1.4.3(@opentelemetry/api@1.9.0)(next@16.0.0(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))':
     dependencies:
       '@vercel/edge-config-fs': 0.1.0
     optionalDependencies:
