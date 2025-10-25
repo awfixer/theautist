@@ -11,6 +11,12 @@ const nextConfig = {
   // Optimize images
   images: {
     formats: ['image/webp', 'image/avif'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'assets.awfixer.com',
+      },
+    ],
   },
   // Reduce bundle size
   modularizeImports: {
