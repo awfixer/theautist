@@ -11,7 +11,11 @@
       "Bash(time pnpm build)",
       "Bash(pnpm build:*)",
       "Bash(pnpm lint:*)",
-      "Bash(timeout 300s pnpm run build)"
+      "Bash(timeout 300s pnpm run build)",
+      "Bash(mkdir:*)",
+      "Bash(node:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(timeout 30s pnpm dev)"
     ],
     "deny": [],
     "ask": []

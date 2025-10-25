@@ -7,6 +7,9 @@ const navItems = {
   '/projects': {
     name: 'projects',
   },
+  'https://hackertalks.blog': {
+    name: 'blog',
+  },
   'https://inv.wtf/deadinside': {
     name: 'discord',
   },
